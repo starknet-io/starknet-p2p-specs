@@ -41,6 +41,17 @@ h5 {
 
 # Starknet P2P Protocol
 
+**Content**
+
+1. [Overview](#overview)
+2. [Core Definitions](#core-definitions)
+3. [Protocols](#protocols)
+    1. [Common Types](#common-types)
+    2. [Discovery](#discovery)
+    3. [Block Propagation](#block-propagation)
+    4. [Synchronization](#synchronization)
+
+----
 ## Overview
 
 This document aims to provide an overview and necessary details for implementing the P2P protocol for Starknet nodes.
