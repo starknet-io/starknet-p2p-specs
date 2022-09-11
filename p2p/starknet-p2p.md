@@ -1,43 +1,4 @@
 
-<style>
-.options_col { column-count: 2 };
-
-.option {break-inside: avoid-column; };
-
-.open_point {
-    border-radius:10px;
-    background-color : yellow
-}
-
-.to_add { background-color : lightblue }
-
-div.side_note {
-    border-radius: 10px;
-    padding: 20px;
-    background-color : lightgreen;
-    color:black
-}
-
-h1 {
-    font-size: 2.10em;
-}
-
-h2 {
-    font-size: 1.95em;
-}
-
-h3 {
-    font-size: 1.80em;
-}
-
-h4 {
-    font-size: 1.6em;
-}
-
-h5 {
-    font-size: 1.3em;
-}
-</style>
 
 # Starknet P2P Protocol
 
@@ -61,22 +22,6 @@ Familiarity with [Starknet](https://starknet.io/) is assumed.
 ### Document Conventions
 
 Unless otherwise noted, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL", NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
-
-While WIP, open points are highlighted in light yellow, and points to add are highlighted in light blue:
-
-<table border="0">
- <tr>
-    <td>
-
-<mark class="open_point">Open point</mark>
-</td>
-    <td>
-
-<mark class="to_add">to be added</mark>
-
-</td>
- </tr>
-</table>
 
 ## Core Definitions
 
@@ -271,8 +216,10 @@ The chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/tra
 Note that while technically a node can serve both as a full node and a bootstrap node, this isn't recommended, as bootstrap nodes generally need to be available to serve their discovery role.
 
 
+<blockquote>
+OPEN: how to choose peers to prevent eclipse (and other) attacks
+</blockquote>
 
-<mark class="open_point">how to choose peers to prevent eclipse (and other) attacks</mark>
 
 #### Messages
 
@@ -328,9 +275,9 @@ We list here core capabilities that SHOULD be exposed by nodes in the network.
 | `core/block-propagate/1` | The node participates in block propagation |
 
 
-<div class="side_note">
-We will later add capability definition for transaction propagation (transaction pools), and potentially other capabilities.
-</div>
+<blockquote>
+Note: We will later add capability definition for transaction propagation (transaction pools), and potentially other capabilities.
+</blockquote>
 
 ----
 ### Block Propagation
@@ -459,7 +406,9 @@ Full state synchronization includes the block headers and bodies (transaction an
 Chain synchronization is the process of downloading (and verifying) the necessary block information.
 The synchronizing node can choose to connect to several peers and ask to get ranges of data.
 
-<mark class="open_point">Is it possible that a given node does not support sync? i.e. do we need to verify support of synching in the handshake?</mark>
+<blockquote>
+OPEN: Is it possible that a given node does not support sync? i.e. do we need to verify support of synching in the handshake?
+</blockquote>
 
 ```plantuml
 
@@ -566,7 +515,8 @@ message StateDiffs
 }
 ```
 
-<mark class="open_point" >allow state diffs to be retrieved in parts?</mark>
+<blockquote>OPEN: allow state diffs to be retrieved in parts?</blockquote>
+
 
 ##### Data Validation
 
