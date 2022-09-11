@@ -61,98 +61,9 @@ Different flows, namely block propagation, synchronization and transaction propa
 
 
 ### Common Types
-We begin by describing some common message types used in the different protocols:
 
-```protobuf
-message FieldElement
-{
-    bytes elements = 1;
-}
+Common message types, relevant to several protocols are in [common.proto](./proto/common.proto).
 
-message PeerID
-{
-    bytes id = 1;
-}
-
-message BlockHeader
-{
-    FieldElement parent_block_hash = 1;
-    uint64 block_number = 2;
-    FieldElement global_state_root = 3;
-    FieldElement sequencer_address = 4;
-    uint64 block_timestamp = 5;
-
-    uint32 transaction_count = 6;
-    FieldElement transaction_commitment = 7;
-
-    uint32 event_count = 8;
-    FieldElement event_commitment = 9;
-
-    uint32 protocol_version = 10;
-
-}
-
-message InvokeTransaction
-{
-    FieldElement contract_address = 1;
-    FieldElement entry_point_selector = 2;
-    repeated FieldElement calldata = 3;
-    repeated FieldElement signature = 4;
-    FieldElement max_fee = 5;
-    FieldElement version = 6;
-}
-
-
-message DeclareTransaction
-{
-    ContractClass contract_class = 1;
-    FieldElement sender_address = 2;
-    FieldElement max_fee = 3;
-    repeated FieldElement signature = 4;
-    FieldElement nonce = 5;
-    FieldElement version = 6;
-}
-
-message ContractClass
-{
-    message EntryPoint {
-        FieldElement selector = 1;
-        FieldElement offset = 2;
-    }
-
-    repeated EntryPoint constructor_entry_points = 1;
-    repeated EntryPoint external_entry_points = 2;
-    repeated EntryPoint l1_handler_entry_points = 3;
-    repeated string used_builtins = 4;
-    FieldElement contract_program_hash = 5;
-    repeated FieldElement bytecode = 6;
-    string version = 7;
-}
-
-message Transaction
-{
-    oneof txn
-    {
-        InvokeTransaction invoke = 1;
-        DeclareTransaction declare = 2;
-    }
-}
-
-message Event
-{
-    ...
-}
-
-message BlockBody
-{
-    uint32 transaction_count = 1;
-    repeated Transaction transactions = 2;
-
-    uint32 event_count = 3;
-    repeated Event events = 4;
-}
-
-```
 Peer IDs should be displayed and accepted using content identifier (CID) encoding, described [here](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#peer-ids).
 
 ----
@@ -221,25 +132,10 @@ OPEN: how to choose peers to prevent eclipse (and other) attacks
 </blockquote>
 
 
+
 #### Messages
 
-```protobuf=
-
-
-message NewNode
-{
-    PeerID id = 1;
-
-    repeated string capabilities = 2;
-}
-
-message KnownNodes
-{
-    PeerID id = 1; //id of publishing node
-    repeated PeerID nodes = 2; //nodes known to the publishing node
-}
-
-```
+Messages are defined [here](./proto/discovery.proto).
 
 Every node defines a set of capabilities it supports.
 Capabilities are represented as strings, with a few capabilities defined as part of the core protocol.
@@ -342,54 +238,7 @@ Note that this assumes blocks received are blocks that are agreed by the consens
 
 #### Messages
 
-```protobuf
-message NewBlockHeader
-{
-    uint32 request_id = 1;
-
-    BlockHeader header = 2;
-}
-
-
-message NewBlockBody
-{
-    FieldElement block_hash = 1;
-    BlockBody body = 2;
-}
-
-message NewBlockState
-{
-    FieldElement block_hash = 1;
-    BlockStateUpdate state_update = 2;
-}
-
-message BlockStateUpdate
-{
-    message StorageDiff {
-        FieldElement key = 1;
-        FieldElement value = 2;
-    }
-
-    message ContractDiff {
-
-        FieldElement contract_address = 1;
-        FieldElement nonce = 2;
-        repeated StorageDiff storage_diffs = 3;
-    }
-
-    message DeployedContract {
-        FieldElement contract_address = 1;
-        FieldElement contract_class_hash = 2;
-    }
-
-    uint32 request_id = 1;
-
-    repeated ContractDiff contract_diffs = 2;
-    repeated DeployedContract deployed_contracts = 3;
-    repeated FieldElement declared_contract_class_hashes = 4;
-
-}
-```
+Messages specification is [here](./proto/propagation.proto)
 
 Where contract class hash is defined [here](https://docs.starknet.io/docs/Contracts/contract-hash) and contract address is as defined [here](https://docs.starknet.io/docs/Contracts/contract-address).
 
@@ -446,74 +295,8 @@ A peer responding to a message MUST adhere to both limits, i.e. the message MUST
 
 ##### Messages
 
-```protobuf
+Messages are defined [here](./proto/sync.proto)
 
-message GetBlockHeaders
-{
-    uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
-    uint64 size_limit = 4; //limit on size of returned messages.
-
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
-
-}
-
-/*
-    A response to GetBlockHeaders, returning a consecutive `count` of blocks (or less if there are less available)
- */
-message BlockHeaders
-{
-    uint32 request_id = 1;
-
-    repeated BlockHeader headers = 2;
-}
-
-message GetBlockBodies
-{
-    uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
-    uint64 size_limit = 4;
-
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
-
-}
-
-message BlockBodies
-{
-    uint32 request_id = 1;
-
-    repeated BlockBody block_bodies = 2;
-}
-
-message GetStateDiffs
-{
-    uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
-    uint64 size_limit = 4;
-
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
-}
-
-message StateDiffs
-{
-
-
-    message BlockStateUpdateWithHash
-    {
-        FieldElement block_hash = 1;
-        BlockStateUpdate state_update = 2;
-    }
-
-    uint32 request_id = 1;
-    repeated BlockStateUpdateWithHash block_state_updates = 2;
-}
-```
 
 <blockquote>OPEN: allow state diffs to be retrieved in parts?</blockquote>
 
@@ -581,47 +364,6 @@ Of course, different chunks (of state and class declarations) can be requested f
 
 ##### Messages
 
-```protobuf
-
-message GetStateSnapshotChunk
-{
-    uint32 request_id = 1;
-
-    uint64 chunk_number = 2;
-}
-
-message StateSnapshotChunk
-{
-    uint32 request_id = 1;
-
-    uint64 block_number = 2;
-    uint64 chunk_number = 3;
-
-    repeated BlockStateUpdate.StorageDiff storage_diffs = 4; //all the storage diffs in this
-
-    repeated bytes commitment_path = 5; //the merkle path to the committed state root, for each diff
-
-}
-
-message GetClassSnapshotChunk
-{
-    uint32 request_id = 1;
-
-    uint64 chunk_number = 2;
-}
-
-message ClassSnapshotChunk
-{
-    uint32 request_id = 1;
-
-    uint64 block_number = 2;
-    uint64 chunk_number = 3;
-
-    repeated ContractClass classes = 4; //the set of contract classes in the requested chunk
-
-    repeated bytes commitment_path = 5; //the merkle path to the committed state root, for each class definition
-}
-
-```
+Messages are specified [here](./proto/state_sync.proto).
 
 For each diff, the state chunk should provide the merkle path to the state root.
