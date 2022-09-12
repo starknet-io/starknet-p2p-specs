@@ -74,38 +74,7 @@ Discovery is the process of joining the network and discovering other relevant p
 
 Simple protocol for discovery, based on pub sub implementation (similar to [pubsub-based discovery](https://github.com/libp2p/js-libp2p-pubsub-peer-discovery/)):
 
-
-```plantuml
-
-@startuml
-
-participant "NewNode" as nn
-collections "`_starknet_nodes/` subscribers" as block_topic
-collections "Peers" as peers
-
-
-nn -> block_topic : NewNode(me)
-block_topic -> peers: NewNode
-
-alt valid message & needs to connect
-    peers -> nn: handshake
-    nn --> peers:
-else valid message
-    peers -> peers: keep new node
-end
-
-loop every interval
-    note over block_topic, peers
-        republish every interval
-    end note
-    peers -> block_topic: KnownNodes()
-    block_topic -> peers: KnownNodes()
-end
-
-@enduml
-
-```
-
+![discovery](https://user-images.githubusercontent.com/77265175/189590881-e31ad7d0-be38-49d6-b284-29030853a452.png)
 
 1. A node connects to at least one node of the network
     - Using either [rendezvous protocol](https://github.com/libp2p/specs/tree/master/rendezvous#overview), or bootstrap nodes.
@@ -183,38 +152,7 @@ The block propagation flow is the flow where nodes propagate information on newl
 The block originator (the one publishing the block) publishes the necessary information to a well-known topic, with other nodes subsribed to that topic, and receiving the information.
 The pubsub implementation will take care of publishing the information to available nodes.
 
-
-```plantuml
-@startuml
-
-participant "Block Originator" as orig
-collections "/blocks subscribers" as block_topic
-participant "This Node" as this #lightblue
-
-
-par
-    orig -> block_topic: NewBlockHeader(header)
-    block_topic -> this:
-    this -> this: validate header
-    alt invalid header
-        this -> this: update invalid header (originator)
-        note right
-            a chance for a node
-            to mark a peer as problematic
-        end note
-    end
-else
-    orig -> block_topic: NewBlockBody(body)
-    block_topic -> this:
-    this -> this: validate and\nupdate body
-else
-    orig -> block_topic: NewStateDiff(state_diff)
-    block_topic -> this:
-    this -> this: validate and\nupdate state
-end
-
-@enduml
-```
+![block_propagation](https://user-images.githubusercontent.com/77265175/189591198-f855f04d-57c4-4faa-87b2-6aa1c43868ee.png)
 
 Of course, in this case, invalid body or header will invalidate the block (and the node should mark it as problematic.).
 
@@ -259,32 +197,7 @@ The synchronizing node can choose to connect to several peers and ask to get ran
 OPEN: Is it possible that a given node does not support sync? i.e. do we need to verify support of synching in the handshake?
 </blockquote>
 
-```plantuml
-
-@startuml
-
-participant "This Node" as this #lightblue
-participant "Peer" as peer
-
-this -> peer: GetBlockHeaders(start_block,limit,direction)
-note right
-  start_block: starting block number
-  limit: how many, at most, headers to retrieve
-  direction: retrieve direction - forward/backward
-end note
-peer -> this: BlockHeaders(...)
-
-par get bodies
-    this -> peer: GetBlockBodies(start_block,limit,direction)
-    peer -> this: BlockBodies(...)
-else get state
-    this -> peer: GetStateDiffs(start_block,limit,direction)
-    peer -> this: StateDiffs(...)
-end
-@enduml
-
-```
-
+![chain_sync](https://user-images.githubusercontent.com/77265175/189591383-34af1b79-5fcf-440f-8216-e0b420dca130.png)
 
 The node asks for a _range_ of block headers and bodies. Relevant responses should be of consecutive headers/bodies starting from the request block number and working in the direction requested.
 This should allow nodes to ask several peers for different ranges at the same time, as well work however they wish (from the tip backward, or from some point forward) to fill the necessary state.
@@ -316,44 +229,9 @@ The synchronizing node receives different pieces of the state and "stitches" the
 
 The size of returned chunks is deterministic and known in advance as a chain-wide parameter.
 
+![state_sync](https://user-images.githubusercontent.com/77265175/189591568-856067e9-ff66-4555-bb1d-9dd13293fe39.png)
 
-```plantuml
 
-participant "This Node" as this #lightblue
-participant "Peer" as peer
-
-group sync headers
-    note over this, peer
-        as described under "Chain Synchronization"
-    end note
-
-    this -> peer:
-    peer --> this:
-end
-
-loop while full state not received
-    this -> peer: GetSnapshotStateChunk(chunk_number)
-    peer -> this: StateSnapshotChunk(block_num,chunk_number, state_values, proof)
-    this -> this: verify proof and apply chunk
-
-    this -> peer: GetClassSnapshotChunk(chunk_number)
-    note right: can also get class declarations
-
-    peer -> this: ClassSnapshotChunk(block_num, chunk_number, classes, proof)
-
-    this -> this: apply class declarations
-
-    loop for remaining blocks from `block_number` to tip
-        this -> peer: GetStateDiffs(start_block,limit,direction)
-        peer -> this: StateDiffs(...)
-        this -> this: apply state diffs
-    end
-    note right
-         Apply state diffs up to tip for each chunk
-    end note
-end
-
-```
 The node asks different peers (denoted by `peer` above) for different parts of the snapshot.
 
 Note that we also have seperate requests for the class declarations, which are also part of the state. Although the request/response is similar, this is defined as a separate set of messages since the proof is a bit different (a different height of merkle tree). It also allows a node to optimize this storate of classes separately from the full contract state.
