@@ -1,0 +1,27 @@
+
+@startuml
+
+participant "NewNode" as nn
+collections "`_starknet_nodes/` subscribers" as block_topic
+collections "Peers" as peers
+
+
+nn -> block_topic : NewNode(me)
+block_topic -> peers: NewNode
+
+alt valid message & needs to connect
+    peers -> nn: handshake
+    nn --> peers:
+else valid message
+    peers -> peers: keep new node
+end
+
+loop every interval
+    note over block_topic, peers
+        republish every interval
+    end note
+    peers -> block_topic: KnownNodes()
+    block_topic -> peers: KnownNodes()
+end
+
+@enduml
