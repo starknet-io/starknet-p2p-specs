@@ -35,7 +35,8 @@ message InvokeTransaction
     repeated FieldElement calldata = 3;
     repeated FieldElement signature = 4;
     FieldElement max_fee = 5;
-    FieldElement version = 6;
+    FieldElement nonce = 6;
+    FieldElement version = 7;
 }
 
 

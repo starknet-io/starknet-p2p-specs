@@ -11,6 +11,7 @@
     2. [Discovery](#discovery)
     3. [Block Propagation](#block-propagation)
     4. [Synchronization](#synchronization)
+    5. [Transaction Propagation](#transaction-propagation)
 
 ----
 ## Overview
@@ -245,3 +246,30 @@ Of course, different chunks (of state and class declarations) can be requested f
 Messages are specified [here](./proto/state_sync.proto).
 
 For each diff, the state chunk should provide the merkle path to the state root.
+
+### Transaction Propagation
+
+The goal of the transaction propagation protocol is to allow pending transactions to be disseminated
+in the network so sequencers can pick them up and add them to blocks.
+
+A participating node should track the pending transactions it recognizes - a transaction pool.
+Transactions are added to this pool when a client submits a new transaction directly to the node,
+or when a peer node shares a new transaction (or set of transactions) that it knows of.
+Transactions are removed from the pool when some sequencer includes them in a block.
+
+#### Adding a New Transaction
+
+When a transaction is submitted to a node, e.g. through [the node API](https://github.com/starkware-libs/starknet-specs/blob/e9415a91dbf08b480fc05bb985d7cf8a93a898bc/api/starknet_write_api.json#L11),
+the node should transmit the new transaction to peers. Notification of the new transaction is done using pub-sub mechanism, using a topic known a-priori (similar to block propagation).
+
+The topic used to notify of new transactions will be `transaction_pool/` + configured chain id.
+Where the configured chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/transactions#chain-id) configured for the node.
+Nodes that maintain a transaction pool should subscribe to the topic on initialization.
+
+The message transmitted should include the complete new transaction.
+A receiving node should validate the transaction, using the same validation used for transactions submitted through the API. Invalid transactions should be discarded.
+
+The message itself should be the [transaction message](https://github.com/starknet-community-libs/starknet-p2p-specs/blob/d46a92040ba2cc1ceeb3c8f36b10403b345e6636/p2p/proto/common.proto#L68).
+
+
+
