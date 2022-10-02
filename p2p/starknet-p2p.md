@@ -271,6 +271,8 @@ The message itself should be the [`Transaction` message](https://github.com/star
 
 #### Synchronizing Transaction Pools
 
+![txn_pool_sync](https://user-images.githubusercontent.com/77265175/193442622-7d64bf77-a2fa-4917-97f6-a7791ec99ad4.png)
+
 The messages described in this section are specified [here](./proto/pool_sync.proto).
 
 When a new node (re-)joins the network, it should synchronize its transaction pool as well.
