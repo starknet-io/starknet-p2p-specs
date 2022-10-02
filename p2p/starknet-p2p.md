@@ -139,11 +139,9 @@ We list here core capabilities that SHOULD be exposed by nodes in the network.
 | `core/blocks-sync/1`     | The node provides information about past blocks and corresponding transactions     |
 | `core/state-sync/1` | The node provides state snapshot synchronization capability that can help with state synchronization |
 | `core/block-propagate/1` | The node participates in block propagation |
+| `core/txn-propagate/1` | The node participates in transaction propagation |
 
 
-<blockquote>
-Note: We will later add capability definition for transaction propagation (transaction pools), and potentially other capabilities.
-</blockquote>
 
 ----
 ### Block Propagation
@@ -269,7 +267,27 @@ Nodes that maintain a transaction pool should subscribe to the topic on initiali
 The message transmitted should include the complete new transaction.
 A receiving node should validate the transaction, using the same validation used for transactions submitted through the API. Invalid transactions should be discarded.
 
-The message itself should be the [transaction message](https://github.com/starknet-community-libs/starknet-p2p-specs/blob/d46a92040ba2cc1ceeb3c8f36b10403b345e6636/p2p/proto/common.proto#L68).
+The message itself should be the [`Transaction` message](https://github.com/starknet-community-libs/starknet-p2p-specs/blob/d46a92040ba2cc1ceeb3c8f36b10403b345e6636/p2p/proto/common.proto#L68).
+
+#### Synchronizing Transaction Pools
+
+The messages described in this section are specified [here](./proto/pool_sync.proto).
+
+When a new node (re-)joins the network, it should synchronize its transaction pool as well.
+The node should connect to peers that support transaction propagation capability, i.e. maintain transaction pools.
+At this point it should send and receive the transaction hashes it currently maintains in the pool - the `KnownPooledTransactions` message. This message contains the _hashes_ of the transactions known in the pool. Limit on number of hashes is up to the node.
+
+A node receiving a set of new transaction hashes can filter out the set of transactions it already knows.
+At this point it can ask for the transactions it doesn't recognize from its peers. This is the `GetPooledTransactions` message, containing the hashes of the transaction it wishes to learn about.
+
+A response to `GetPooledTransactions` is the `PooledTransactions` message, containing the requested `Transaction` information.
+The order of the returned `Transaction` objects must be the same as the order of the requested hashes (in `GetPooledTransactions`).
+A responding node may impose a lower limit on the returned transactions, i.e. return less transactions than requested. The requesting node can then request these hashes again.
+
+Transactions that are not in the pool, even if their hash was announced in `KnownPooledTransactions`, should not be returned.
+It is ok to return an empty list in `PooledTransactions` if none of the requested hashes is in the pool.
+
+
 
 
 
