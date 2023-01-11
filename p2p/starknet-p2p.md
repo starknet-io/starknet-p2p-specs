@@ -261,7 +261,7 @@ When a transaction is submitted to a node, e.g. through [the node API](https://g
 the node should transmit the new transaction to peers. Notification of the new transaction is done using pub-sub mechanism, using a topic known a-priori (similar to block propagation).
 
 The topic used to notify of new transactions will be `transaction_pool/` + configured chain id.
-Where the configured chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/transactions#chain-id) configured for the node.
+Where the configured chain id is the [starknet chain id](https://docs.starknet.io/documentation/architecture_and_concepts/Blocks/transactions/#chain-id) configured for the node.
 Nodes that maintain a transaction pool should subscribe to the topic on initialization.
 
 The message transmitted should include the complete new transaction.
