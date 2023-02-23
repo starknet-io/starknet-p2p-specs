@@ -92,7 +92,7 @@ Simple protocol for discovery, based on pub sub implementation (similar to [pubs
 
 
 
-The chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/transactions#chain-id) configured for the node.
+The chain id is the [starknet chain id](https://docs.starknet.io/documentation/architecture_and_concepts/Blocks/transactions/#chain-id) configured for the node.
 
 Note that while technically a node can serve both as a full node and a bootstrap node, this isn't recommended, as bootstrap nodes generally need to be available to serve their discovery role.
 
