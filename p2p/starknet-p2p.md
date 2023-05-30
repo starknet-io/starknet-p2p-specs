@@ -50,8 +50,16 @@ Agent versions SHOULD follow [semantic versioning](http://semver.org) format.
 Use protobuf (`proto3`) for message encoding/decoding between peers.
 Specific message schemas to be defined for each protocol.
 
-Messages that tie into other messages in one flow, i.e. messages expecting a response and providing a response MUST include a `request_id` (a positive integer) that allows nodes to correlate messages in the same flow.
-The request id, together with the sender id, should be enough for identifying the flow.
+On request-response protocol, each request opens a new libp2p stream. The request and response payload have the following structure:
+
+```
+payload = length(compressed-payload) || compressed-pyload
+```
+
+Where `compressed-payload` is a zstd compression output of the message and length is a function that returns a bytestring
+containing varint encoded length of its parameter.
+
+After writing the corresponding payload, client MUST close the output stream to signal end of stream.
 
 ----
 

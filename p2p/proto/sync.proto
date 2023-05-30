@@ -1,70 +1,82 @@
 syntax = "proto3";
 
+package starknet.sync;
+
 import "p2p/proto/common.proto";
 import "p2p/proto/propagation.proto";
 
-message GetBlockHeaders
-{
-    uint32 request_id = 1;
+message Request {
+    oneof request {
+        GetBlockHeaders get_block_headers = 1;
+        GetBlockBodies get_block_bodies = 2;
+        GetStateDiffs get_state_diffs = 3;
+        Status status = 4;
+    }
+}
 
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
-    uint64 size_limit = 4; //limit on size of returned messages.
+message Response {
+    oneof response {
+        BlockHeaders block_headers = 1;
+        BlockBodies block_bodies = 2;
+        StateDiffs state_diffs = 3;
+        Status status = 4;
+    }
+}
 
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
+enum Direction {
+    FORWARD = 0;
+    BACKWARD = 1;
+}
 
+message GetBlockHeaders {
+    starknet.common.FieldElement start_block =
+        2;            // block hash of the starting block
+    uint64 count = 3; // how many block, at most, to retrieve from this requested
+    // starting point
+    uint64 size_limit = 4; // limit on size of returned messages.
+
+    Direction direction = 5;
 }
 
 /*
-    A response to GetBlockHeaders, returning a consecutive `count` of blocks (or less if there are less available)
+    A response to GetBlockHeaders, returning a consecutive `count` of blocks (or
+   less if there are less available)
  */
-message BlockHeaders
-{
-    uint32 request_id = 1;
+message BlockHeaders { repeated starknet.common.BlockHeader headers = 2; }
 
-    repeated BlockHeader headers = 2;
-}
-
-message GetBlockBodies
-{
-    uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
+message GetBlockBodies {
+    starknet.common.FieldElement start_block =
+        2;            // block hash of the starting block
+    uint64 count = 3; // how many block, at most, to retrieve from this requested
+    // starting point
     uint64 size_limit = 4;
 
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
-
+    Direction direction = 5;
 }
 
-message BlockBodies
-{
-    uint32 request_id = 1;
+message BlockBodies { repeated starknet.common.BlockBody block_bodies = 2; }
 
-    repeated BlockBody block_bodies = 2;
-}
-
-message GetStateDiffs
-{
-    uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
+message GetStateDiffs {
+    starknet.common.FieldElement start_block =
+        2;            // block hash of the starting block
+    uint64 count = 3; // how many block, at most, to retrieve from this requested
+    // starting point
     uint64 size_limit = 4;
 
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
+    Direction direction = 5;
 }
 
-message StateDiffs
-{
-
-
-    message BlockStateUpdateWithHash
-    {
-        FieldElement block_hash = 1;
-        BlockStateUpdate state_update = 2;
+message StateDiffs {
+    message BlockStateUpdateWithHash {
+        starknet.common.FieldElement block_hash = 1;
+        starknet.propagation.BlockStateUpdate state_update = 2;
     }
 
-    uint32 request_id = 1;
     repeated BlockStateUpdateWithHash block_state_updates = 2;
+}
+
+message Status {
+    uint64 height = 1;
+    starknet.common.FieldElement hash = 2;
+    starknet.common.FieldElement chain_id = 3;
 }
