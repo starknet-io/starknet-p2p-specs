@@ -3,43 +3,70 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 import "p2p/proto/propagation.proto";
 
-
-message GetStateSnapshotChunk
-{
+// request a range from the contract state tree that matches the given root (block)
+// starts at 'start' and ends no less than 'end'.
+// the result is a stream of ContractRange and PatriciaRangeProof
+message GetContractRange {
     uint32 request_id = 1;
-
-    uint64 chunk_number = 2;
+    Hash root = 2;
+    Hash start = 3;
+    Hash end = 4;
+    uint32 chunks_per_proof = 5; // how many ContractRange items to send before sending a proof
 }
 
-message StateSnapshotChunk
-{
-    uint32 request_id = 1;
 
-    uint64 block_number = 2;
-    uint64 chunk_number = 3;
 
-    repeated BlockStateUpdate.StorageDiff storage_diffs = 4; //all the storage diffs in this
-
-    repeated bytes commitment_path = 5; //the merkle path to the committed state root, for each diff
-
+message PatriciaNode {
+    // 9 bytes for an edge (1 byte length, felt path, felt value),
+    // 8 bytes for binary (left and right felt)
+    bytes data = 1;
 }
 
-message GetClassSnapshotChunk
-{
-    uint32 request_id = 1;
-
-    uint64 chunk_number = 2;
+message PatriciaProof {
+    repeated PatriciaNode nodes = 1;
 }
 
-message ClassSnapshotChunk
-{
-    uint32 request_id = 1;
-
-    uint64 block_number = 2;
-    uint64 chunk_number = 3;
-
-    repeated ContractClass classes = 4; //the set of contract classes in the requested chunk
-
-    repeated bytes commitment_path = 5; //the merkle path to the committed state root, for each class definition
+message PatriciaRangeProof {
+    PatriciaProof left = 3;
+    PatriciaProof right = 4;
 }
 
+// stream
+message ContractRange {
+    uint32 request_id = 1;
+    repeated ContractState state = 2;
+}
+
+// duplicate of GetContractRange. Can introduce a 'type' instead.
+message GetClassRange {
+    uint32 request_id = 1;
+    Hash root = 2;
+    Hash start = 3;
+    Hash end = 4;
+    uint32 chunks_per_proof = 5;
+}
+
+
+message ClassRange {
+    uint32 request_id = 1;
+    repeated Class classes = 2;
+}
+
+message StorageRangeQuery {
+    uint32 range_id = 1;
+    Hash root = 2;
+    Hash start = 3;
+    Hash end = 4;
+}
+
+message GetContractStorageRange {
+    uint32 request_id = 1;
+    Hash state_root = 2;
+    repeated StorageRangeQuery query = 3;
+}
+
+message ContractStorageRange {
+    uint32 request_id = 1;
+    uint32 range_id = 2;
+    repeated ContractStoredValue keyValue = 3;
+}

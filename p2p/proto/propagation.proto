@@ -2,49 +2,44 @@ syntax = "proto3";
 
 import "p2p/proto/common.proto";
 
-message NewBlockHeader
-{
-    uint32 request_id = 1;
-
-    BlockHeader header = 2;
+// sent to all peers (except the ones this was received from, if any).
+// for a fraction of peers, also send BlockHeader, Signatures, BlockProof, StateDiffs and Class (as if they asked for them)
+// TBD: maybe can remember if got GetBlocks with include_transactions and include_events from some and send them that as well.
+message NewBlock {
+    uint64 height = 2;
 }
 
-
-message NewBlockBody
-{
-    FieldElement block_hash = 1;
-    BlockBody body = 2;
+// for now, we assume a small consensus, so this fits in 1M. Else, these will be repeated
+message Signatures {
+    uint32 request_id = 1; // 0 if pushed
+    uint64 height = 2; // FFU to allow multiplexing. We actually just need this or request_id
+    repeated Signature signatures = 3;
 }
 
-message NewBlockState
+message StateDiff
 {
-    FieldElement block_hash = 1;
-    BlockStateUpdate state_update = 2;
-}
-
-message BlockStateUpdate
-{
-    message StorageDiff {
-        FieldElement key = 1;
-        FieldElement value = 2;
-    }
-
+    // a bit more efficient than the state sync separation
     message ContractDiff {
-
-        FieldElement contract_address = 1;
-        FieldElement nonce = 2;
-        repeated StorageDiff storage_diffs = 3;
+        Address address = 1;
+        Felt252 nonce = 2;
+        Felt252 class_hash = 3; // can change for replace_class or new contract
+        repeated ContractStoredValue values = 4;
     }
 
-    message DeployedContract {
-        FieldElement contract_address = 1;
-        FieldElement contract_class_hash = 2;
-    }
 
+    uint32 request_id = 1; // 0 if pushed
+    uint64 height = 2;
+    repeated ContractDiff contract_diffs = 3;
+}
+
+// can be several in a single reply
+message Transactions {
     uint32 request_id = 1;
+    repeated Transaction transactions = 2;
+}
 
-    repeated ContractDiff contract_diffs = 2;
-    repeated DeployedContract deployed_contracts = 3;
-    repeated FieldElement declared_contract_class_hashes = 4;
-
+// can be several in a single reply
+message Events {
+    uint32 request_id = 1;
+    repeated Event events = 2;
 }

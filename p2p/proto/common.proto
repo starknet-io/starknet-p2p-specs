@@ -1,70 +1,88 @@
 syntax = "proto3";
+import "google/protobuf/timestamp.proto";
 
-message FieldElement
-{
+message Felt252 {
     bytes elements = 1;
 }
 
-message PeerID
-{
+message Hash {
+    bytes elements = 1;
+}
+
+message Address {
+    bytes elements = 1;
+}
+
+message PeerID {
     bytes id = 1;
 }
 
-message BlockHeader
-{
-    FieldElement parent_block_hash = 1;
-    uint64 block_number = 2;
-    FieldElement global_state_root = 3;
-    FieldElement sequencer_address = 4;
-    uint64 block_timestamp = 5;
+message ChainID {
+    bytes id = 1;
+}
 
-    uint32 transaction_count = 6;
-    FieldElement transaction_commitment = 7;
+message BlockID {
+    Hash hash = 1;
+    // TODO: do we need commitment on block parts, if it is big?
+}
 
-    uint32 event_count = 8;
-    FieldElement event_commitment = 9;
+message Signature {
+    repeated Felt252 parts = 1;
+}
+
+message BlockHeader {
+    BlockID parent_block = 1;
+    uint64 height = 2;
+    google.protobuf.Timestamp time = 3;
+
+    Hash state = 4;
+    Address sequencer_address = 5;
+
+    Hash strand_blook_proof = 6; // for Kth block behind
+    Hash transactions = 7; // merkle, good also for sync, to not split/merge/reorder
+    // Hash state_diffs = 8;  TBD: chain, avoid the need to build Merkle when syncing. Problem: order not clear (issuance? may have several for the same contract strawn apart)
+    Hash events = 9; // merkle, avoid the need to execute when syncing. By order of issuance
 
     uint32 protocol_version = 10;
+    ChainID chain_id = 11;
+}
 
+message BlockProof {
+    bytes proof = 1;
 }
 
 message InvokeTransaction
 {
-    FieldElement contract_address = 1;
-    FieldElement entry_point_selector = 2;
-    repeated FieldElement calldata = 3;
-    repeated FieldElement signature = 4;
-    FieldElement max_fee = 5;
-    FieldElement nonce = 6;
-    FieldElement version = 7;
+    Address sender_address = 1;
+    repeated Felt252 calldata = 2;
+    Signature signature = 3;
+    Felt252 max_fee = 4;
+    Felt252 nonce = 5;
+    Felt252 version = 6;
 }
 
 
 message DeclareTransaction
 {
-    ContractClass contract_class = 1;
-    FieldElement sender_address = 2;
-    FieldElement max_fee = 3;
-    repeated FieldElement signature = 4;
-    FieldElement nonce = 5;
-    FieldElement version = 6;
+    Address sender_address = 1;
+    Hash class_hash = 2;
+    Hash compiled_hash = 3;
+    Signature signature = 4;
+    Felt252 max_fee = 5;
+    Felt252 nonce = 6;
+    Felt252 version = 7;
+
 }
 
-message ContractClass
-{
-    message EntryPoint {
-        FieldElement selector = 1;
-        FieldElement offset = 2;
-    }
-
-    repeated EntryPoint constructor_entry_points = 1;
-    repeated EntryPoint external_entry_points = 2;
-    repeated EntryPoint l1_handler_entry_points = 3;
-    repeated string used_builtins = 4;
-    FieldElement contract_program_hash = 5;
-    repeated FieldElement bytecode = 6;
-    string version = 7;
+message L1HandlerTransaction {
+    Address contract = 1;
+    Felt252 entry_point_selector = 2;
+    repeated Felt252 calldata = 3;
+    Felt252 nonce = 5;
+    Felt252 version = 6;
 }
+
+// NOTE: not keeping old tx types
 
 message Transaction
 {
@@ -72,17 +90,36 @@ message Transaction
     {
         InvokeTransaction invoke = 1;
         DeclareTransaction declare = 2;
+        L1HandlerTransaction l1handler = 3;
     }
 }
 
-message Event
-{}
+message Event {
+    Felt252 from_address = 1;
+    repeated Felt252 keys = 2;
+    repeated Felt252 data = 3;
+}
 
-message BlockBody
-{
-    uint32 transaction_count = 1;
-    repeated Transaction transactions = 2;
+// leafs of the contract state tre
+message ContractState {
+    Hash address = 1; // the key
+    Hash class = 2;
+    Hash storage = 3; // patricia
+    uint64 nonce = 4;
+}
 
-    uint32 event_count = 3;
-    repeated Event events = 4;
+// is it better to separate the definition from the hashes? (will need to repeate the hashes
+// for the definitions stream)
+// or, make the definitions optional? maybe it is enough to know only that a class exists, not its definition
+// which may be fetched lazily later.
+message Class {
+    Hash definition_hash = 1;
+    Hash compiled_hash = 2;
+    bytes definition = 3; // compressed?
+}
+
+// optimized for flat storage, not through a trie (not sharing key prefixes)
+message ContractStoredValue {
+    Felt252 key = 1;
+    Felt252 value = 2;
 }

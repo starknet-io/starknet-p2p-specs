@@ -2,22 +2,19 @@ syntax = "proto3";
 
 import "p2p/proto/common.proto";
 
-message KnownPooledTransactions
-{
-    //The pooled (pending) transaction hashes known to the sending node
-    repeated FieldElement hashes = 1;
-}
 
 message GetPooledTransactions
 {
     uint32 request_id = 1;
 
-    repeated FieldElement requested_hashes = 2;
+    repeated Hash hashes = 2; // TODO: no hashes means return all for sync (alternative: send all on peer connect, but then peer gets them from all its peers). Maybe also have a "known transactions" message the peer sends to all peers it didn't request from
 }
+
+// new transactions (hashes) are sent as a stream on an always-open channel ?
 
 message PooledTransactions
 {
     uint32 request_id = 1;
 
-    repeated Transaction transactions = 2;
+    repeated Felt252 transactions = 2;
 }

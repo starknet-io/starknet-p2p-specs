@@ -3,68 +3,21 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 import "p2p/proto/propagation.proto";
 
-message GetBlockHeaders
-{
+// result is the same as for NewBlock push
+message GetBlocks {
     uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
-    uint64 size_limit = 4; //limit on size of returned messages.
-
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
-
+    uint64 start = 2; // height
+    uint64 end = 3; // height
+    bool include_transactions = 4; // if true, the result will include also transaction chunks
+    bool include_events = 5; // if true, the result will include also transaction chunks
 }
 
-/*
-    A response to GetBlockHeaders, returning a consecutive `count` of blocks (or less if there are less available)
- */
-message BlockHeaders
-{
+message GetTransactions {
     uint32 request_id = 1;
-
-    repeated BlockHeader headers = 2;
+    uint64 height = 2;
 }
 
-message GetBlockBodies
-{
+message GetEvents {
     uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
-    uint64 size_limit = 4;
-
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
-
-}
-
-message BlockBodies
-{
-    uint32 request_id = 1;
-
-    repeated BlockBody block_bodies = 2;
-}
-
-message GetStateDiffs
-{
-    uint32 request_id = 1;
-
-    FieldElement start_block = 2; //block hash of the starting block
-    uint64 count = 3; //how many block, at most, to retrieve from this requested starting point
-    uint64 size_limit = 4;
-
-    bool backward = 5; //TRUE iff the order of headers returned should be in descending order
-}
-
-message StateDiffs
-{
-
-
-    message BlockStateUpdateWithHash
-    {
-        FieldElement block_hash = 1;
-        BlockStateUpdate state_update = 2;
-    }
-
-    uint32 request_id = 1;
-    repeated BlockStateUpdateWithHash block_state_updates = 2;
+    uint64 height = 2;
 }
