@@ -4,12 +4,13 @@ import "p2p/proto/common.proto";
 import "p2p/proto/propagation.proto";
 
 // result is the same as for NewBlock push
+// TBD: in case of reorg (e.g. sequencer failure, probably for the centralized scenario only), need to differentiate by hashes
 message GetBlocks {
     uint32 request_id = 1;
     uint64 start = 2; // height
     uint64 end = 3; // height
-    bool include_transactions = 4; // if true, the result will include also transaction chunks
-    bool include_events = 5; // if true, the result will include also transaction chunks
+
+    bool include_signatures = 4; // if we have a proof of the block (syncing backwards), it can contain the signature verifications (TBD: verify)
 }
 
 message GetTransactions {
@@ -18,6 +19,11 @@ message GetTransactions {
 }
 
 message GetEvents {
+    uint32 request_id = 1;
+    uint64 height = 2;
+}
+
+message GetReceipts {
     uint32 request_id = 1;
     uint64 height = 2;
 }

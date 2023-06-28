@@ -7,13 +7,14 @@ import "p2p/proto/common.proto";
 // TBD: maybe can remember if got GetBlocks with include_transactions and include_events from some and send them that as well.
 message NewBlock {
     uint64 height = 2;
+    // TBD: include also the number of followup messages (with limit in the protocol)? To avoid a DOS attack?
 }
 
 // for now, we assume a small consensus, so this fits in 1M. Else, these will be repeated
 message Signatures {
     uint32 request_id = 1; // 0 if pushed
     uint64 height = 2; // FFU to allow multiplexing. We actually just need this or request_id
-    repeated Signature signatures = 3;
+    repeated Signature signatures = 3; // can be more explicit here as this is not part of account abstraction
 }
 
 message StateDiff

@@ -22,13 +22,9 @@ message PatriciaNode {
     bytes data = 1;
 }
 
-message PatriciaProof {
-    repeated PatriciaNode nodes = 1;
-}
-
+// internal nodes required to build the trie given the range (leaves)
 message PatriciaRangeProof {
-    PatriciaProof left = 3;
-    PatriciaProof right = 4;
+    PatriciaNode nodes = 3;
 }
 
 // stream
@@ -68,5 +64,6 @@ message GetContractStorageRange {
 message ContractStorageRange {
     uint32 request_id = 1;
     uint32 range_id = 2;
+    // add Address contract ?
     repeated ContractStoredValue keyValue = 3;
 }

@@ -35,20 +35,21 @@ message BlockHeader {
     uint64 height = 2;
     google.protobuf.Timestamp time = 3;
 
-    Hash state = 4;
+    Hash state = 4; // hash of contract and class patricia tries
     Address sequencer_address = 5;
 
     Hash strand_blook_proof = 6; // for Kth block behind
     Hash transactions = 7; // merkle, good also for sync, to not split/merge/reorder
     // Hash state_diffs = 8;  TBD: chain, avoid the need to build Merkle when syncing. Problem: order not clear (issuance? may have several for the same contract strawn apart)
     Hash events = 9; // merkle, avoid the need to execute when syncing. By order of issuance
+    Hash receipts = 10;
 
-    uint32 protocol_version = 10;
-    ChainID chain_id = 11;
+    uint32 protocol_version = 11;
+    ChainID chain_id = 12;
 }
 
 message BlockProof {
-    bytes proof = 1;
+    bytes proof = 1; // proof size is currently 142K
 }
 
 message InvokeTransaction
@@ -83,6 +84,7 @@ message L1HandlerTransaction {
 }
 
 // NOTE: not keeping old tx types
+// NOTE: receipt should have failure/success status
 
 message Transaction
 {
@@ -123,3 +125,4 @@ message ContractStoredValue {
     Felt252 key = 1;
     Felt252 value = 2;
 }
+
