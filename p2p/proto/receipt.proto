@@ -76,6 +76,5 @@ message Receipt {
 }
 
 message Receipts {
-    uint32 request_id = 1;
-    repeated Receipt receipts = 2;
+    repeated Receipt receipts = 1;
 }

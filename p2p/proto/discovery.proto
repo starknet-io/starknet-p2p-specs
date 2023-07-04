@@ -2,7 +2,7 @@ syntax = "proto3";
 
 import "p2p/proto/common.proto";
 
-// do we need this? capabilities are protocols
+// do we need this? capabilities are protocols (but need arguments, e.g. history length)
 /*
 message NewNode
 {

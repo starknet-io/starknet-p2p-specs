@@ -23,83 +23,81 @@ message ChainID {
 
 message BlockID {
     Hash hash = 1;
-    // TODO: do we need commitment on block parts, if it is big?
+    uint64 height = 2;
 }
 
 message Signature {
-    repeated Felt252 parts = 1;
+    repeated Felt252 parts = 1; // no separation of r, s because of AA
+}
+
+message Merkle {
+    uint32 n_leaves = 1; // needed to know the height, so as to how many nodes to expect in a proof.
+                         // and also when receiving all leaves, how many to expect
+    Hash root = 2;
 }
 
 message BlockHeader {
     BlockID parent_block = 1;
-    uint64 height = 2;
-    google.protobuf.Timestamp time = 3;
+    google.protobuf.Timestamp time = 2; // TODO: see if this needs to be Felt252 or can be converted
 
-    Hash state = 4; // hash of contract and class patricia tries
-    Address sequencer_address = 5;
+    Hash state = 3; // hash of contract and class patricia tries. Same as in L1.
 
-    Hash strand_blook_proof = 6; // for Kth block behind
-    Hash transactions = 7; // merkle, good also for sync, to not split/merge/reorder
-    // Hash state_diffs = 8;  TBD: chain, avoid the need to build Merkle when syncing. Problem: order not clear (issuance? may have several for the same contract strawn apart)
-    Hash events = 9; // merkle, avoid the need to execute when syncing. By order of issuance
-    Hash receipts = 10;
+    Address sequencer_address = 4;
 
-    uint32 protocol_version = 11;
-    ChainID chain_id = 12;
+    Hash strand_block_proof = 5; // for Kth block behind
+
+    Merkle transactions = 6; // By order of execution
+
+    Merkle state_diffs = 7; //  By order of (contract, key), taking last in case of duplicates
+
+    Merkle events = 8; // By order of issuance.
+
+    Merkle receipts = 9; // By order of issuance
+
+    uint32 protocol_version = 10;
+    ChainID chain_id = 11;
 }
 
 message BlockProof {
     bytes proof = 1; // proof size is currently 142K
 }
 
+message TransactionCommon {
+    Felt252 nonce = 1; // FFU: volition will also add the selected state tree
+    Felt252 version = 2;
+}
+
+message L2TransactionCommon {
+    Address sender = 1;
+    Signature signature = 2;
+    Felt252 max_fee = 4; // FFU: may change according to fee market spec
+}
+
 message InvokeTransaction
 {
-    Address sender_address = 1;
-    repeated Felt252 calldata = 2;
-    Signature signature = 3;
-    Felt252 max_fee = 4;
-    Felt252 nonce = 5;
-    Felt252 version = 6;
+    repeated Felt252 calldata = 1; // not streaming this, meaning limited to ~30K felts.
 }
 
 
 message DeclareTransaction
 {
-    Address sender_address = 1;
-    Hash class_hash = 2;
-    Hash compiled_hash = 3;
-    Signature signature = 4;
-    Felt252 max_fee = 5;
-    Felt252 nonce = 6;
-    Felt252 version = 7;
-
+    Hash class_hash = 1;
+    Hash compiled_hash = 2;
 }
+
+message L2Transaction {
+    L2TransactionCommon common = 1;
+    oneof txn {
+        InvokeTransaction invoke = 2;
+        DeclareTransaction declare = 3;
+    }
+}
+
 
 message L1HandlerTransaction {
     Address contract = 1;
     Felt252 entry_point_selector = 2;
     repeated Felt252 calldata = 3;
-    Felt252 nonce = 5;
-    Felt252 version = 6;
-}
-
-// NOTE: not keeping old tx types
-// NOTE: receipt should have failure/success status
-
-message Transaction
-{
-    oneof txn
-    {
-        InvokeTransaction invoke = 1;
-        DeclareTransaction declare = 2;
-        L1HandlerTransaction l1handler = 3;
-    }
-}
-
-message Event {
-    Felt252 from_address = 1;
-    repeated Felt252 keys = 2;
-    repeated Felt252 data = 3;
 }
 
 // leafs of the contract state tre
@@ -115,9 +113,9 @@ message ContractState {
 // or, make the definitions optional? maybe it is enough to know only that a class exists, not its definition
 // which may be fetched lazily later.
 message Class {
-    Hash definition_hash = 1;
+    Hash definition_hash = 1; // not required if we have the definition
     Hash compiled_hash = 2;
-    bytes definition = 3; // compressed?
+    bytes definition = 3; // compressed? size limit or split to chunks.
 }
 
 // optimized for flat storage, not through a trie (not sharing key prefixes)
@@ -125,4 +123,23 @@ message ContractStoredValue {
     Felt252 key = 1;
     Felt252 value = 2;
 }
+
+// NOTE: not keeping old tx types for clarity
+// TODO: add DeployAccountTransaction
+
+message Transaction
+{
+    TransactionCommon common = 1;
+    oneof txn {
+        L2Transaction l2Transaction = 2;
+        L1HandlerTransaction l1handler = 3;
+    }
+}
+
+message Event {
+    Felt252 from_address = 1;
+    repeated Felt252 keys = 2;
+    repeated Felt252 data = 3;
+}
+
 

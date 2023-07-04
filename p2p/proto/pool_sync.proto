@@ -2,19 +2,23 @@ syntax = "proto3";
 
 import "p2p/proto/common.proto";
 
-
+// Support also non-validating node that wants to know of the mempool (e.g. to estimate fee in case of first price)
+// Result is PooledTransactions+
 message GetPooledTransactions
 {
-    uint32 request_id = 1;
-
-    repeated Hash hashes = 2; // TODO: no hashes means return all for sync (alternative: send all on peer connect, but then peer gets them from all its peers). Maybe also have a "known transactions" message the peer sends to all peers it didn't request from
+    message Hashes {
+        repeated Hash hashes = 1;
+    }
+    oneof known {
+        Hashes txs = 1;
+        uint64 marker = 2; // since last returned marker.
+    }
 }
 
-// new transactions (hashes) are sent as a stream on an always-open channel ?
+message PooledTransactions {
+    bool added = 1; // false means removed
 
-message PooledTransactions
-{
-    uint32 request_id = 1;
+    repeated Transaction transactions = 2;
 
-    repeated Felt252 transactions = 2;
+    uint64 marker = 3; // optional, if the peer supports that.
 }

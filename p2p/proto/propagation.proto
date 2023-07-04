@@ -3,18 +3,15 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 
 // sent to all peers (except the ones this was received from, if any).
-// for a fraction of peers, also send BlockHeader, Signatures, BlockProof, StateDiffs and Class (as if they asked for them)
-// TBD: maybe can remember if got GetBlocks with include_transactions and include_events from some and send them that as well.
+// for a fraction of peers, also send the GetBlocks response (as if they asked for it for this block)
 message NewBlock {
-    uint64 height = 2;
-    // TBD: include also the number of followup messages (with limit in the protocol)? To avoid a DOS attack?
+    BlockID id = 1;
 }
 
 // for now, we assume a small consensus, so this fits in 1M. Else, these will be repeated
 message Signatures {
-    uint32 request_id = 1; // 0 if pushed
-    uint64 height = 2; // FFU to allow multiplexing. We actually just need this or request_id
-    repeated Signature signatures = 3; // can be more explicit here as this is not part of account abstraction
+    BlockID id = 1;
+    repeated Signature signatures = 2; // can be more explicit here about the signature structure as this is not part of account abstraction
 }
 
 message StateDiff
@@ -27,20 +24,19 @@ message StateDiff
         repeated ContractStoredValue values = 4;
     }
 
-
-    uint32 request_id = 1; // 0 if pushed
-    uint64 height = 2;
     repeated ContractDiff contract_diffs = 3;
 }
 
 // can be several in a single reply
 message Transactions {
-    uint32 request_id = 1;
     repeated Transaction transactions = 2;
 }
 
 // can be several in a single reply
 message Events {
-    uint32 request_id = 1;
     repeated Event events = 2;
+}
+
+message Classes {
+    repeated Class classes = 1;
 }

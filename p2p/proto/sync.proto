@@ -3,27 +3,31 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 import "p2p/proto/propagation.proto";
 
-// result is the same as for NewBlock push
-// TBD: in case of reorg (e.g. sequencer failure, probably for the centralized scenario only), need to differentiate by hashes
+// result is (BlockHeader, StateDiff*)*
 message GetBlocks {
-    uint32 request_id = 1;
-    uint64 start = 2; // height
-    uint64 end = 3; // height
+    enum Direction {
+        Forward = 0;
+        Backward = 1;
+    }
+    BlockID start = 1;
+    Direction direction = 2;
+    uint64 limit = 3;
+    uint64 skip = 4;  // when starting, can send to first node skip=0, limit=100, second skip=100, limit=100, etc.
+    uint64 step = 5; // to allow interleaving from several nodes
+}
 
-    bool include_signatures = 4; // if we have a proof of the block (syncing backwards), it can contain the signature verifications (TBD: verify)
+message GetSignatures {
+    BlockID id = 1;
 }
 
 message GetTransactions {
-    uint32 request_id = 1;
-    uint64 height = 2;
+    BlockID id = 1;
 }
 
 message GetEvents {
-    uint32 request_id = 1;
-    uint64 height = 2;
+    BlockID id = 1;
 }
 
 message GetReceipts {
-    uint32 request_id = 1;
-    uint64 height = 2;
+    BlockID id = 1;
 }
