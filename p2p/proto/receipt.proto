@@ -43,6 +43,7 @@ message ExecutionResources {
   uint64 n_memory_holes = 3;
 }
 
+// TBD: also deploy of contract?
 message InvokeTransactionReceipt {
   CommonTransactionReceiptProperties common = 1;
 }

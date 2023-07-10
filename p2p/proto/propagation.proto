@@ -24,7 +24,8 @@ message StateDiff
         repeated ContractStoredValue values = 4;
     }
 
-    repeated ContractDiff contract_diffs = 3;
+    uint32 tree_id = 1;
+    repeated ContractDiff contract_diffs = 2;
 }
 
 // can be several in a single reply
@@ -38,5 +39,6 @@ message Events {
 }
 
 message Classes {
-    repeated Class classes = 1;
+    uint32 tree_id = 1;
+    repeated Class classes = 2;
 }

@@ -33,7 +33,7 @@ message PatriciaNode {
 
 // internal nodes required to build the trie given the range (leaves)
 message PatriciaRangeProof {
-    PatriciaNode nodes = 1;
+    repeated PatriciaNode nodes = 1;
 }
 
 // stream of leaves in the contracts tree

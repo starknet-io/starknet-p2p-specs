@@ -36,26 +36,29 @@ message Merkle {
     Hash root = 2;
 }
 
+// Note: commitments may change to be for the previous blocks like comet/tendermint
+// hash of block header sent to L1
 message BlockHeader {
     BlockID parent_block = 1;
+
     google.protobuf.Timestamp time = 2; // TODO: see if this needs to be Felt252 or can be converted
 
-    Hash state = 3; // hash of contract and class patricia tries. Same as in L1.
+    Address sequencer_address = 3;
 
-    Address sequencer_address = 4;
+    Merkle state_diffs = 4; //  By order of (contract, key), taking last in case of duplicates. This means the proposer needs to sort after finishing the block (TBD: patricia? )
 
-    Hash strand_block_proof = 5; // for Kth block behind
+    // State is optional and appears every X blocks for the last block. This is to support
+    // snapshot sync and also so that light nodes can sync on state without state diffs.
+    Merkle state = 5; // hash of contract and class patricia tries. Same as in L1. Later more trees will be included
 
-    Merkle transactions = 6; // By order of execution
+    Hash proof_fact = 6; // for Kth block behind. A hash of the output of the proof
 
-    Merkle state_diffs = 7; //  By order of (contract, key), taking last in case of duplicates
+    // A leaf is the tx data, events and receipts, each hashed separately
+    Merkle transactions = 7; // By order of execution
 
-    Merkle events = 8; // By order of issuance.
+    uint32 protocol_version = 8;
 
-    Merkle receipts = 9; // By order of issuance
-
-    uint32 protocol_version = 10;
-    ChainID chain_id = 11;
+    ChainID chain_id = 9;
 }
 
 message BlockProof {
@@ -100,30 +103,6 @@ message L1HandlerTransaction {
     repeated Felt252 calldata = 3;
 }
 
-// leafs of the contract state tre
-message ContractState {
-    Hash address = 1; // the key
-    Hash class = 2;
-    Hash storage = 3; // patricia
-    uint64 nonce = 4;
-}
-
-// is it better to separate the definition from the hashes? (will need to repeate the hashes
-// for the definitions stream)
-// or, make the definitions optional? maybe it is enough to know only that a class exists, not its definition
-// which may be fetched lazily later.
-message Class {
-    Hash definition_hash = 1; // not required if we have the definition
-    Hash compiled_hash = 2;
-    bytes definition = 3; // compressed? size limit or split to chunks.
-}
-
-// optimized for flat storage, not through a trie (not sharing key prefixes)
-message ContractStoredValue {
-    Felt252 key = 1;
-    Felt252 value = 2;
-}
-
 // NOTE: not keeping old tx types for clarity
 // TODO: add DeployAccountTransaction
 
@@ -140,6 +119,29 @@ message Event {
     Felt252 from_address = 1;
     repeated Felt252 keys = 2;
     repeated Felt252 data = 3;
+}
+
+// leafs of the contract state tre
+message ContractState {
+    Hash address = 1; // the key
+    Hash class = 2;
+    Hash storage = 3; // patricia
+    uint64 nonce = 4;
+}
+
+// is it better to separate the definition from the hashes? (will need to repeate the hashes
+// for the definitions stream)
+// or, make the definitions optional? maybe it is enough to know only that a class exists, not its definition
+// which may be fetched lazily later.
+message Class {
+    Hash compiled_hash = 2; // TBD: add also/instead CASM definition (instead of every node compiling)?
+    bytes definition = 3; // compressed? size limit or split to chunks.
+}
+
+// optimized for flat storage, not through a trie (not sharing key prefixes)
+message ContractStoredValue {
+    Felt252 key = 1;
+    Felt252 value = 2;
 }
 
 

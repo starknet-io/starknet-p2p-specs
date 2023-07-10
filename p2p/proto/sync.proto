@@ -9,7 +9,7 @@ message GetBlocks {
         Forward = 0;
         Backward = 1;
     }
-    BlockID start = 1;
+    BlockID start = 1; // exclude start from the result
     Direction direction = 2;
     uint64 limit = 3;
     uint64 skip = 4;  // when starting, can send to first node skip=0, limit=100, second skip=100, limit=100, etc.
