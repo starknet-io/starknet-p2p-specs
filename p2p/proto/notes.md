@@ -13,9 +13,6 @@
 * TBD: consensus messages
 * TBD: reverted transactions
 * TBD: stark friendly hashes or not (calculate in os? so light nodes don't trust the consensus)
-*
-
-
-* TBD: many merkles in the block header
-
+* TBD: "pubsub" mechanism where a node subscribes to getting push messages instead of GetXXX.
+** GetXXX messages will need to be supported for network issues / failures
 

@@ -20,7 +20,7 @@ message PatriciaNode {
     }
 }
 
-// internal nodes required to build the trie given the range (leaves)
+// non leaf nodes required to build the trie given the range (leaves)
 message PatriciaRangeProof {
     repeated PatriciaNode nodes = 1;
 }

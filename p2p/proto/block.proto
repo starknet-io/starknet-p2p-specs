@@ -17,7 +17,8 @@ message BlockHeader {
 
     Address sequencer_address = 3;
 
-    Merkle state_diffs = 4; //  By order of (contract, key), taking last in case of duplicates. This means the proposer needs to sort after finishing the block (TBD: patricia? )
+    Merkle state_diffs = 4; //  By order of (contract, key), taking last in case of duplicates.
+                            // This means the proposer needs to sort after finishing the block (TBD: patricia? )
 
     // State is optional and appears every X blocks for the last block. This is to support
     // snapshot sync and also so that light nodes can sync on state without state diffs.
@@ -25,6 +26,7 @@ message BlockHeader {
 
     Hash proof_fact = 6; // for Kth block behind. A hash of the output of the proof
 
+    // The following merkles can be built on the fly while sequencing/validating txs.
     Merkle transactions = 7; // By order of execution
 
     Merkle events = 8; // By order of issuance.
