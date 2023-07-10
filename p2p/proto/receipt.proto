@@ -22,10 +22,10 @@ message CommonTransactionReceiptProperties {
   uint32 transaction_index = 2;
   Felt252 actual_fee = 3;
   repeated MessageToL1 messages_sent = 4;
-  repeated Event events = 5;
+  // repeated Event events = 5; separate
   // Optional
-  MessageToL2 consumed_message = 6;
-  ExecutionResources execution_resources = 7;
+  MessageToL2 consumed_message = 5;
+  ExecutionResources execution_resources = 6;
 }
 
 message ExecutionResources {
@@ -74,6 +74,10 @@ message Receipt {
     DeprecatedDeployTransactionReceipt deprecated_deploy = 4;
     DeployAccountTransactionReceipt deploy_account = 5;
   }
+}
+
+message GetReceipts {
+  BlockID id = 1;
 }
 
 message Receipts {

@@ -1,18 +1,7 @@
 syntax = "proto3";
 
 import "p2p/proto/common.proto";
-import "p2p/proto/propagation.proto";
-
-
-// request a range from the contract state tree that matches the given root (block)
-// starts at 'start' and ends no less than 'end'.
-// the result is  (ContractRange+, PatriciaRangeProof)*
-message GetContractRange {
-    Hash root = 2;
-    Hash start = 3;
-    Hash end = 4;
-    uint32 chunks_per_proof = 5; // how many ContractRange items to send before sending a proof
-}
+import "p2p/proto/state.proto";
 
 message PatriciaNode {
     message Edge {
@@ -34,6 +23,24 @@ message PatriciaNode {
 // internal nodes required to build the trie given the range (leaves)
 message PatriciaRangeProof {
     repeated PatriciaNode nodes = 1;
+}
+
+// leafs of the contract state tre
+message ContractState {
+    Hash address = 1; // the key
+    Hash class = 2;
+    Hash storage = 3; // patricia
+    uint64 nonce = 4;
+}
+
+// request a range from the contract state tree that matches the given root (block)
+// starts at 'start' and ends no less than 'end'.
+// the result is  (ContractRange+, PatriciaRangeProof)*
+message GetContractRange {
+    Hash root = 2;
+    Hash start = 3;
+    Hash end = 4;
+    uint32 chunks_per_proof = 5; // how many ContractRange items to send before sending a proof
 }
 
 // stream of leaves in the contracts tree

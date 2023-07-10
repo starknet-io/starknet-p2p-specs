@@ -8,11 +8,12 @@
 ** Getting transactions/events is separate
 * Protocols: blocks (headers+bodies or separate?), transactions, events, receipts, mempool. States? fastsync?
 * Using Merkle trees so can decommit individual transactions, events, etc. e.g. node that tracks just one contract for events
-** Can maybe put all data into one tree (e.g. a receipt will contain events as well). Can support requesting just partial (and getting hashes for the rest, a mini merkle)
+** TBD: can save on the internal merkle nodes by having one where a leaf is the tx data, events and receipts, each hashed separately. But then getting a part of a leaf will require sending the other parts' hashes.
+** Events are separate from receipt
 * TBD: consensus messages
 * TBD: reverted transactions
 * TBD: stark friendly hashes or not (calculate in os? so light nodes don't trust the consensus)
-
+*
 
 
 * TBD: many merkles in the block header

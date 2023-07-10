@@ -1,5 +1,4 @@
 syntax = "proto3";
-import "google/protobuf/timestamp.proto";
 
 message Felt252 {
     bytes elements = 1;
@@ -36,112 +35,7 @@ message Merkle {
     Hash root = 2;
 }
 
-// Note: commitments may change to be for the previous blocks like comet/tendermint
-// hash of block header sent to L1
-message BlockHeader {
-    BlockID parent_block = 1;
-
-    google.protobuf.Timestamp time = 2; // TODO: see if this needs to be Felt252 or can be converted
-
-    Address sequencer_address = 3;
-
-    Merkle state_diffs = 4; //  By order of (contract, key), taking last in case of duplicates. This means the proposer needs to sort after finishing the block (TBD: patricia? )
-
-    // State is optional and appears every X blocks for the last block. This is to support
-    // snapshot sync and also so that light nodes can sync on state without state diffs.
-    Merkle state = 5; // hash of contract and class patricia tries. Same as in L1. Later more trees will be included
-
-    Hash proof_fact = 6; // for Kth block behind. A hash of the output of the proof
-
-    // A leaf is the tx data, events and receipts, each hashed separately
-    Merkle transactions = 7; // By order of execution
-
-    uint32 protocol_version = 8;
-
-    ChainID chain_id = 9;
-}
-
-message BlockProof {
-    bytes proof = 1; // proof size is currently 142K
-}
-
-message TransactionCommon {
-    Felt252 nonce = 1; // FFU: volition will also add the selected state tree
-    Felt252 version = 2;
-}
-
-message L2TransactionCommon {
-    Address sender = 1;
-    Signature signature = 2;
-    Felt252 max_fee = 4; // FFU: may change according to fee market spec
-}
-
-message InvokeTransaction
-{
-    repeated Felt252 calldata = 1; // not streaming this, meaning limited to ~30K felts.
-}
 
 
-message DeclareTransaction
-{
-    Hash class_hash = 1;
-    Hash compiled_hash = 2;
-}
-
-message L2Transaction {
-    L2TransactionCommon common = 1;
-    oneof txn {
-        InvokeTransaction invoke = 2;
-        DeclareTransaction declare = 3;
-    }
-}
-
-
-message L1HandlerTransaction {
-    Address contract = 1;
-    Felt252 entry_point_selector = 2;
-    repeated Felt252 calldata = 3;
-}
-
-// NOTE: not keeping old tx types for clarity
-// TODO: add DeployAccountTransaction
-
-message Transaction
-{
-    TransactionCommon common = 1;
-    oneof txn {
-        L2Transaction l2Transaction = 2;
-        L1HandlerTransaction l1handler = 3;
-    }
-}
-
-message Event {
-    Felt252 from_address = 1;
-    repeated Felt252 keys = 2;
-    repeated Felt252 data = 3;
-}
-
-// leafs of the contract state tre
-message ContractState {
-    Hash address = 1; // the key
-    Hash class = 2;
-    Hash storage = 3; // patricia
-    uint64 nonce = 4;
-}
-
-// is it better to separate the definition from the hashes? (will need to repeate the hashes
-// for the definitions stream)
-// or, make the definitions optional? maybe it is enough to know only that a class exists, not its definition
-// which may be fetched lazily later.
-message Class {
-    Hash compiled_hash = 2; // TBD: add also/instead CASM definition (instead of every node compiling)?
-    bytes definition = 3; // compressed? size limit or split to chunks.
-}
-
-// optimized for flat storage, not through a trie (not sharing key prefixes)
-message ContractStoredValue {
-    Felt252 key = 1;
-    Felt252 value = 2;
-}
 
 
