@@ -21,6 +21,7 @@ message NewPooledTransactions {
     uint64 marker = 2; // optional, if the peer supports that.
 }
 
+// TBD: trusted. Alternative is to sync on transactions or on contract diff (remove key-value) to get latest nonce
 message IncludedTransactions { // those txs no longer in the pool since they were included.
                               // just send the hash. (note: a node should remove txs with same/lower nonce)
                               // TBD: Merkle proofs of contract state instead?
