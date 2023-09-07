@@ -1,65 +1,102 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
 
-message TransactionCommon {
-    Felt252 nonce = 1; // FFU: volition will also add the selected state tree
-    Felt252 version = 2;
+message ResourceLimits {
+    Felt252 max_amount         = 1;
+    Felt252 max_price_per_unit = 2;
 }
 
-message L2TransactionCommon {
-    Address sender = 1;
-    Signature signature = 2;
-    Felt252 max_fee = 4; // FFU: may change according to fee market spec
+message AccountSignature {
+    repeated Felt252 parts = 1;
 }
-
-message InvokeTransaction
-{
-    repeated Felt252 calldata = 1; // not streaming this, meaning limited to ~30K felts.
-}
-
-
-message DeclareTransaction
-{
-    Hash class_hash = 1;
-    Hash compiled_hash = 2;
-}
-
-message L2Transaction {
-    L2TransactionCommon common = 1;
-    oneof txn {
-        InvokeTransaction invoke = 2;
-        DeclareTransaction declare = 3;
-    }
-}
-
-
-message L1HandlerTransaction {
-    Address contract = 1;
-    Felt252 entry_point_selector = 2;
-    repeated Felt252 calldata = 3;
-}
-
-// NOTE: not keeping old tx types for clarity
-// TODO: add DeployAccountTransaction
 
 message Transaction
 {
-    TransactionCommon common = 1;
+    message FeeMarket {
+        ResourceLimits   l1_gas              = 1;
+        ResourceLimits   l2_gas              = 2;
+        Felt252          tip                 = 3;
+        Address          paymaster           = 4;
+    }
+
+    message StateDomain {
+        string           nonce        = 1;
+        string           fee          = 2;
+    }
+
+    message Common {
+        uint32           version                  = 1;
+        optional         Address          sender  = 2;  // not in invoke v0
+        Felt252          max_fee                  = 3;
+        AccountSignature signature                = 4;
+        optional         Felt252 nonce            = 5;  // not in declare v0, invoke v0
+        optional         FeeMarket fee_market     = 6;  // starting from v3
+        optional         StateDomain state_domain = 7;  // starting from v3
+
+    }
+
+    message Declare {
+        Common common = 1;
+        optional Felt252 compiled_class_hash = 2;
+
+    }
+
+    message Deploy {
+        Hash     class_hash       = 1;
+        Felt252  address_salt     = 2;
+        repeated Felt252 calldata = 3;
+    }
+
+    message DeployAccount {
+        Common common = 1;
+        Felt252          address_salt     = 2;
+        repeated         Felt252 calldata = 3;
+    }
+
+    message Target {
+        optional Address          address              = 1;  // not in invoke v1, v3
+        optional Felt252          entry_point_selector = 2;  // not in invoke v1, v3
+        repeated Felt252 calldata                      = 3;
+    }
+
+    message Invoke {
+        Common common = 1;
+        Target target = 2;
+
+    }
+
+    message L1Handler {
+        Felt252 nonce  = 1;
+        Target  target = 2;
+    }
+
     oneof txn {
-        L2Transaction l2Transaction = 2;
-        L1HandlerTransaction l1handler = 3;
+        Declare       declare        = 1;
+        Deploy        deploy         = 2;
+        DeployAccount deploy_account = 3;
+        Invoke        invoke         = 4;
+        L1Handler     l1_handler     = 5;
     }
 }
 
 
-
-message GetTransactions {
-    BlockID id = 1;
+// TBD: can support a flag to return tx hashes only, good for standalone mempool to remove them,
+// or any node that keeps track of transaction streaming in the consensus.
+message TransactionsRequest {
+    Iteration iteration = 1;
 }
 
 // can be several in a single reply
 message Transactions {
-    repeated Transaction transactions = 2;
+    repeated Transaction items = 2;
+}
+
+message TransactionsResponse {
+    uint64   block_number             = 1;
+    oneof responses {
+        Transactions transactions = 2;
+        Fin          fin          = 3;
+    }
 }
 
 

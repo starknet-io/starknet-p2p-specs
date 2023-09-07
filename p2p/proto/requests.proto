@@ -1,6 +1,0 @@
-syntax = "proto3";
-
-import "p2p/proto/common.proto";
-import "p2p/proto/propagation.proto";
-
-
