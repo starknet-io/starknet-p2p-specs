@@ -18,16 +18,13 @@ message PooledTransactionsRequest
 
 // Can be also a push, similar to NewBlock. So a full node that accepts a new transaction from a wallet
 // can propagate it without being pulled
+// nodes should track state diffs to know when txs have been included (the contract nonce increases)
 message PolledTransactionsResponse {
-    uint64   marker                   = 1;  // optional, if the peer supports that.
+    optional uint64   marker = 1;  // optional, if the peer supports that.
+    bool     baseline        = 2;  // means treat all data as baseline, not diff (may be if 'known' was sent but the mempool was reset/reorged
 
     oneof responses {
-        Transactions new      = 2;
-        Hashes       included = 3; // those txs no longer in the pool since they were included.
-                                    // just send the hash. (note: a node should remove txs with same/lower nonce)
-                                    // TBD: Merkle proofs of contract state instead?
-                                    // TBD: trusted. Alternative is to sync on transactions or on contract diff (remove key-value) to get latest nonce
-                                    // lighter data than tracking new blocks to read txs.
-        Fin          fin      = 4;
+        Transactions pending  = 3;  // if 'known' is given, they will be only txs added after the known
+        Fin          fin      = 5;
     }
 }
