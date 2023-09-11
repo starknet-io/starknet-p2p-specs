@@ -145,7 +145,8 @@ message Transactions {
 }
 
 message TransactionsResponse {
-    uint64   block_number             = 1;
+    uint64 block_number = 1;
+
     oneof responses {
         Transactions transactions = 2;
         Fin          fin          = 3;

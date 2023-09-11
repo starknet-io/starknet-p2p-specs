@@ -70,7 +70,7 @@ message ClassRangeResponse {
     Hash root  = 1;
     oneof responses {
         Classes classes = 2;
-        Fin fin  = 3;
+        Fin     fin     = 3;
     }
 }
 

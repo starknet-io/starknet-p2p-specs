@@ -20,6 +20,6 @@ message EventsResponse {
     uint64   block_number = 1;
     oneof responses {
         Events events = 2;
-        Fin fin = 3;
+        Fin    fin    = 3;
     }
 }

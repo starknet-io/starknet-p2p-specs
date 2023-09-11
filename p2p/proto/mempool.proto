@@ -25,6 +25,6 @@ message PolledTransactionsResponse {
 
     oneof responses {
         Transactions pending  = 3;  // if 'known' is given, they will be only txs added after the known
-        Fin          fin      = 5;
+        Fin          fin      = 4;
     }
 }
