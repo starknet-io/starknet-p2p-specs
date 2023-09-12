@@ -146,10 +146,11 @@ message Transactions {
 
 message TransactionsResponse {
     uint64 block_number = 1;
+    Hash block_hash = 2;
 
     oneof responses {
-        Transactions transactions = 2;
-        Fin          fin          = 3;
+        Transactions transactions = 3;
+        Fin          fin          = 4;
     }
 }
 

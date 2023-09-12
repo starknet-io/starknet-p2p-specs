@@ -18,8 +18,10 @@ message EventsResponse {
     }
 
     uint64   block_number = 1;
+    Hash block_hash = 2;
+
     oneof responses {
-        Events events = 2;
-        Fin    fin    = 3;
+        Events events = 3;
+        Fin    fin    = 4;
     }
 }

@@ -87,8 +87,10 @@ message Receipts {
 
 message ReceiptsResponse {
   uint64   block_number     = 1;
+  Hash block_hash = 2;
+
   oneof responses {
-    Receipts receipts = 2;
-    Fin      fin      = 3;
+    Receipts receipts = 3;
+    Fin      fin      = 4;
   }
 }
