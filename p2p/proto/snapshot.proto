@@ -50,10 +50,12 @@ message ContractRange {
 }
 
 message ContractRangeResponse {
-    Hash state_root  = 1;
+    Hash state_root     = 1;
+    Hash contracts_root = 2;
+    Hash classes_root   = 3;
     oneof responses {
-        ContractRange range = 2;
-        Fin fin = 3;
+        ContractRange range = 4;
+        Fin           fin   = 5;
     }
 }
 
@@ -67,10 +69,12 @@ message ClassRangeRequest {
 }
 
 message ClassRangeResponse {
-    Hash root  = 1;
+    Hash root           = 1;
+    Hash contracts_root = 2;
+    Hash classes_root   = 3;
     oneof responses {
-        Classes classes = 2;
-        Fin     fin     = 3;
+        Classes classes = 4;
+        Fin     fin     = 5;
     }
 }
 
