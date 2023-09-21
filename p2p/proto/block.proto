@@ -39,9 +39,9 @@ message BlockProof {
 // for a fraction of peers, also send the GetBlockHeaders and GetBlockBodies response (as if they asked for it for this block)
 message NewBlock {
     oneof maybe_full {
-        uint64               block_number = 1;
-        BlockHeadersResponse header       = 2;
-        BlockBodiesResponse  body         = 3;
+        BlockID              id     = 1;
+        BlockHeadersResponse header = 2;
+        BlockBodiesResponse  body   = 3;
     }
 }
 
@@ -51,14 +51,18 @@ message BlockHeadersRequest {
     Iteration iteration = 1;
 }
 
-message BlockHeadersResponse {
-    uint64 block_number = 1;
-
+message BlockHeadersResponsePart {
+    optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
+                             // (kept in here even though it is in the header for consistency with other messages and interleaving)
     oneof header_message {
         BlockHeader header     = 2;
         Signatures  signatures = 3;
         Fin         fin        = 4;
     }
+}
+
+message BlockHeadersResponse {
+    repeated BlockHeadersResponsePart part = 1;
 }
 
 // result is (StateDiff*, Classes*, BlockProof?)* currently in creation order (incr/dec), but may change in the future
@@ -67,7 +71,7 @@ message BlockBodiesRequest {
 }
 
 message BlockBodiesResponse {
-    uint64 block_number = 1;
+    optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
 
     oneof body_message {
         StateDiff  diff    = 2;

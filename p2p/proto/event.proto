@@ -11,17 +11,16 @@ message EventsRequest {
     Iteration iteration = 1;
 }
 
+message Events {
+    repeated Event items = 1;
+}
+
 // can be several in a single reply
 message EventsResponse {
-    message Events {
-        repeated Event items = 1;
-    }
-
-    uint64   block_number = 1;
-    Hash block_hash = 2;
+    optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
 
     oneof responses {
-        Events events = 3;
-        Fin    fin    = 4;
+        Events events = 2;
+        Fin    fin    = 3;
     }
 }

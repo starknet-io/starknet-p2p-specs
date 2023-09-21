@@ -86,11 +86,10 @@ message Receipts {
 }
 
 message ReceiptsResponse {
-  uint64   block_number     = 1;
-  Hash block_hash = 2;
+  optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
 
   oneof responses {
-    Receipts receipts = 3;
-    Fin      fin      = 4;
+    Receipts receipts = 2;
+    Fin      fin      = 3;
   }
 }
