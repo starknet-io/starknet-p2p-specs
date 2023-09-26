@@ -5,7 +5,7 @@ import "google/protobuf/timestamp.proto";
 
 // for now, we assume a small consensus, so this fits in 1M. Else, these will be repeated
 message Signatures {
-    uint64 block_number = 1;
+    BlockID block = 1;
 
     repeated ConsensusSignature signatures = 2; //
                                        // can be more explicit here about the signature structure as this is not part of account abstraction
@@ -52,12 +52,10 @@ message BlockHeadersRequest {
 }
 
 message BlockHeadersResponsePart {
-    optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
-                             // (kept in here even though it is in the header for consistency with other messages and interleaving)
     oneof header_message {
-        BlockHeader header     = 2;
-        Signatures  signatures = 3;
-        Fin         fin        = 4;
+        BlockHeader header     = 1;
+        Signatures  signatures = 2;
+        Fin         fin        = 3; // no support for interleaving for now
     }
 }
 
@@ -77,7 +75,7 @@ message BlockBodiesResponse {
         StateDiff  diff    = 2;
         Classes    classes = 3;
         BlockProof proof   = 4;
-        Fin fin = 5;
+        Fin        fin     = 5;
     }
 }
 
