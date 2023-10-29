@@ -1,88 +1,74 @@
 syntax = "proto3";
 
-message FieldElement
-{
+message Felt252 {
     bytes elements = 1;
 }
 
-message PeerID
-{
+message Hash {
+    bytes elements = 1;
+}
+
+message Hashes {
+    repeated Hash items = 1;
+}
+
+message Address {
+    bytes elements = 1;
+}
+
+message PeerID {
     bytes id = 1;
 }
 
-message BlockHeader
-{
-    FieldElement parent_block_hash = 1;
-    uint64 block_number = 2;
-    FieldElement global_state_root = 3;
-    FieldElement sequencer_address = 4;
-    uint64 block_timestamp = 5;
-
-    uint32 transaction_count = 6;
-    FieldElement transaction_commitment = 7;
-
-    uint32 event_count = 8;
-    FieldElement event_commitment = 9;
-
-    uint32 protocol_version = 10;
-
+message ConsensusSignature {
+    Felt252 r = 1;
+    Felt252 s = 2;
 }
 
-message InvokeTransaction
-{
-    FieldElement contract_address = 1;
-    FieldElement entry_point_selector = 2;
-    repeated FieldElement calldata = 3;
-    repeated FieldElement signature = 4;
-    FieldElement max_fee = 5;
-    FieldElement nonce = 6;
-    FieldElement version = 7;
+message Merkle {
+    uint32 n_leaves = 1;  // needed to know the height, so as to how many nodes to expect in a proof.
+                          // and also when receiving all leaves, how many to expect
+    Hash   root     = 2;
 }
 
-
-message DeclareTransaction
-{
-    ContractClass contract_class = 1;
-    FieldElement sender_address = 2;
-    FieldElement max_fee = 3;
-    repeated FieldElement signature = 4;
-    FieldElement nonce = 5;
-    FieldElement version = 6;
+message Patricia {
+    uint32 height = 1;
+    Hash   root   = 2;
 }
 
-message ContractClass
-{
-    message EntryPoint {
-        FieldElement selector = 1;
-        FieldElement offset = 2;
+message BlockID {
+    uint64 number = 1;
+    Hash   header = 2;
+}
+
+message Iteration {
+    enum Direction {
+        Forward  = 0;
+        Backward = 1;
     }
-
-    repeated EntryPoint constructor_entry_points = 1;
-    repeated EntryPoint external_entry_points = 2;
-    repeated EntryPoint l1_handler_entry_points = 3;
-    repeated string used_builtins = 4;
-    FieldElement contract_program_hash = 5;
-    repeated FieldElement bytecode = 6;
-    string version = 7;
-}
-
-message Transaction
-{
-    oneof txn
-    {
-        InvokeTransaction invoke = 1;
-        DeclareTransaction declare = 2;
+    oneof start {
+        uint64 block_number = 1;
+        Hash   header       = 2;
     }
+    Direction direction = 3;
+    uint64    limit     = 4;
+    uint64    step      = 5;  // to allow interleaving from several nodes
+    // bool interleave = 6; // return results in any order of blocks, per block the messages should still be in the order specified
 }
 
-message Event
-{}
-
-message BlockBody
-{
-    uint32 transaction_count = 1;
-    repeated Transaction transactions = 2;
-
-    uint32 event_count = 3;
-    repeated Event events = 4;
+// mark the end of a stream of messages
+// TBD: may not be required if we open a stream per request.
+message Fin {
+    enum Error {
+        busy     = 0;
+        too_much = 1;
+        unknown  = 2;
+        pruned   = 3;
+    }
+    optional Error error = 1;
 }
+
+
+
+
+
