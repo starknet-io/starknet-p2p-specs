@@ -41,9 +41,9 @@ message SierraEntryPoint {
 }
 
 message Cairo1EntryPoints {
-    repeated SierraEntryPoint constructor = 1;
-    repeated SierraEntryPoint external = 2;
-    repeated SierraEntryPoint l1_handler = 3;
+    repeated SierraEntryPoint externals = 1;
+    repeated SierraEntryPoint l1_handlers = 2;
+    repeated SierraEntryPoint constructors = 3;
 }
 
 message Cairo1Class {
