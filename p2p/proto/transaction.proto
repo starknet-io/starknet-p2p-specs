@@ -115,7 +115,7 @@ message Transaction
         Felt252  nonce                = 1;
         Address  address              = 2;
         Felt252  entry_point_selector = 3;
-        repeated Felt252 calldata     = 5;
+        repeated Felt252 calldata     = 4;
     }
 
     oneof txn {
@@ -141,7 +141,7 @@ message TransactionsRequest {
 
 // can be several in a single reply
 message Transactions {
-    repeated Transaction items = 2;
+    repeated Transaction items = 1;
 }
 
 message TransactionsResponse {
