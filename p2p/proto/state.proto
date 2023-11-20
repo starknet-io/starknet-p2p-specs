@@ -50,7 +50,8 @@ message Cairo1Class {
     bytes abi = 1;
     Cairo1EntryPoints entry_points = 2;
     repeated Felt252 program = 3;
-    bytes compiled = 4;
+    string contract_class_version = 4;
+    bytes compiled = 5;
 }
 
 // is it better to separate the definition from the hashes? (will need to repeate the hashes
@@ -68,5 +69,3 @@ message Classes {
     uint32   domain        = 1;
     repeated Class classes = 2;
 }
-
-
