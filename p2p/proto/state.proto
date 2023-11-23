@@ -18,8 +18,15 @@ message StateDiff
         repeated ContractStoredValue values = 4;
     }
 
+    message ContractAddrToClassHash {
+        Address contract_addr = 1;
+        Hash    class_hash    = 2;
+    }
+
     uint32   domain                      = 1;  // volition state domain
     repeated ContractDiff contract_diffs = 2;
+    repeated ContractAddrToClassHash replaced_classes   = 3;
+    repeated ContractAddrToClassHash deployed_contracts = 4;
 }
 
 message EntryPoint {
