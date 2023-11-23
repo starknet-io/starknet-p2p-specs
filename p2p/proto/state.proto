@@ -33,6 +33,7 @@ message Cairo0Class {
     repeated EntryPoint l1_handlers = 3;
     repeated EntryPoint constructors = 4;
     bytes program = 5;
+    Hash  class_hash    = 6;
 }
 
 message SierraEntryPoint {
