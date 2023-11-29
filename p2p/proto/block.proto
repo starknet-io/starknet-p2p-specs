@@ -29,6 +29,8 @@ message BlockHeader {
     Merkle                    transactions      = 8;   // By order of execution. TBD: required? the client can execute (powerful machine) and match state diff
     Merkle                    events            = 9;   // By order of issuance. TBD: in receipts?
     Merkle                    receipts          = 10;  // By order of issuance.
+    string                    protocol_version  = 11; // Starknet version
+    Felt252                   gas_price         = 12;
 }
 
 message BlockProof {
