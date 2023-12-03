@@ -54,7 +54,7 @@ message Cairo1Class {
     bytes compiled = 5;
 }
 
-// is it better to separate the definition from the hashes? (will need to repeate the hashes
+// is it better to separate the definition from the hashes? (will need to repeat the hashes
 // for the definitions stream)
 // or, make the definitions optional? maybe it is enough to know only that a class exists, not its definition
 // which may be fetched lazily later.
