@@ -21,7 +21,7 @@ message PooledTransactionsRequest
 // nodes should track state diffs to know when txs have been included (the contract nonce increases)
 message PolledTransactionsResponse {
     optional uint64   marker = 1;  // optional, if the peer supports that.
-    bool     baseline        = 2;  // means treat all data as baseline, not diff (may be if 'known' was sent but the mempool was reset/reorged
+    bool     baseline        = 2;  // means treat all data as baseline, not diff (may be if 'known' was sent but the mempool was reset/reforged
 
     oneof responses {
         Transactions pending  = 3;  // if 'known' is given, they will be only txs added after the known
