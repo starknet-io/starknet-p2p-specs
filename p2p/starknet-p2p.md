@@ -48,10 +48,10 @@ Agent versions SHOULD follow [semantic versioning](http://semver.org) format.
 ### Message Encoding
 
 Use protobuf (`proto3`) for message encoding/decoding between peers.
-Specific message schemas to be defined for each protocol.
+Specific message schemas are to be defined for each protocol.
 
 Messages that tie into other messages in one flow, i.e. messages expecting a response and providing a response MUST include a `request_id` (a positive integer) that allows nodes to correlate messages in the same flow.
-The request id, together with the sender id, should be enough for identifying the flow.
+The request id, together with the sender id, should be enough to identify the flow.
 
 ----
 
@@ -88,7 +88,7 @@ Simple protocol for discovery, based on pub sub implementation (similar to [pubs
     - ==Can have subtopics for specific subnets, e.g. discover archive nodes==
 
 3. Subscribers receive the node, and continue to handshake if necessary.
-4. A node re-publishes its known nodes (with ids) every predefined interval.
+4. A node re-publishes its known nodes (with ids) at every predefined interval.
 
 
 
@@ -125,7 +125,7 @@ Capabilities are denoted by identifiers consisting of simple alphanumeric charac
 Identifiers can be concatenated using the slashes (`/`), and followed by a version number. This allows for qualifications ("namespaces") and versioning of provided capabilities.
 
 For example: the capability `core/state/1` provided by a node states that it provides the core state querying capability (its 1st version).
-The exact semantics of the capability and its version is to be documented as part of the definition of the capability. The capability usually translates into the protocols it supports and/or API it provides to peers.
+The exact semantics of the capability and its version are to be documented as part of the definition of the capability. The capability usually translates into the protocols it supports and/or API it provides to peers.
 
 
 ##### Core Capabilities
@@ -155,11 +155,11 @@ The pubsub implementation will take care of publishing the information to availa
 
 Of course, in this case, invalid body or header will invalidate the block (and the node should mark it as problematic.).
 
-A node SHOULD disregard body and and state diffs for blocks with invalid headers.
+A node SHOULD disregard body and state diffs for blocks with invalid headers.
 
 The topic used to publish new blocks will be: `blocks/` + configured chain id.
 Where the configured chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/transactions#chain-id) configured for the node.
-Nodes should subscribe to the topic on initialization.
+Nodes should subscribe to the topic of initialization.
 
 #### Validation
 
@@ -168,7 +168,7 @@ The validation MUST include:
 1. Block number is as expected - consecutive to the parent block.
 2. The parent block hash matches the current known tip.
 3. Transactions and events in the body must match the commitment in the header.
-4. State diff, applied to current state, is consistent with the new state root.
+4. State diff, applied to the current state, is consistent with the new state root.
 
 Note that this assumes blocks received are blocks that are agreed by the consensus, or the node has some way to validate that the block received is agreed by the consensus mechanism.
 
@@ -184,7 +184,7 @@ Where contract class hash is defined [here](https://docs.starknet.io/docs/Contra
 ### Synchronization
 
 A full node is expected to synchronize on the current state of the network.
-Full state synchronization includes the block headers and bodies (transaction and events) + the current available state at the highest block in the consensus.
+Full state synchronization includes the block headers and bodies (transaction and events) + the currently available state at the highest block in the consensus.
 
 
 #### Chain Synchronization
@@ -199,10 +199,10 @@ OPEN: Is it possible that a given node does not support sync? i.e. do we need to
 ![chain_sync](https://user-images.githubusercontent.com/77265175/189591383-34af1b79-5fcf-440f-8216-e0b420dca130.png)
 
 The node asks for a _range_ of block headers and bodies. Relevant responses should be of consecutive headers/bodies starting from the request block number and working in the direction requested.
-This should allow nodes to ask several peers for different ranges at the same time, as well work however they wish (from the tip backward, or from some point forward) to fill the necessary state.
+This should allow nodes to ask several peers for different ranges at the same time, as well as work however they wish (from the tip backward, or from some point forward) to fill the necessary state.
 
 In addition, a requesting node can limit responses by size. So responses must be up to the requested size limit.
-A peer responding to a message MUST adhere to both limits, i.e. the message MUST NOT violate any of the upper limites.
+A peer responding to a message MUST adhere to both limits, i.e. the message MUST NOT violate any of the upper limits.
 
 
 ##### Messages
@@ -233,7 +233,7 @@ The size of returned chunks is deterministic and known in advance as a chain-wid
 
 The node asks different peers (denoted by `peer` above) for different parts of the snapshot.
 
-Note that we also have seperate requests for the class declarations, which are also part of the state. Although the request/response is similar, this is defined as a separate set of messages since the proof is a bit different (a different height of merkle tree). It also allows a node to optimize this storate of classes separately from the full contract state.
+Note that we also have separate requests for the class declarations, which are also part of the state. Although the request/response is similar, this is defined as a separate set of messages since the proof is a bit different (a different height of merkle tree). It also allows a node to optimize this state of classes separately from the full contract state.
 
 Of course, different chunks (of state and class declarations) can be requested from separate peers.
 
@@ -284,7 +284,7 @@ At this point it can ask for the transactions it doesn't recognize from its peer
 
 A response to `GetPooledTransactions` is the `PooledTransactions` message, containing the requested `Transaction` information.
 The order of the returned `Transaction` objects must be the same as the order of the requested hashes (in `GetPooledTransactions`).
-A responding node may impose a lower limit on the returned transactions, i.e. return less transactions than requested. The requesting node can then request these hashes again.
+A responding node may impose a lower limit on the returned transactions, i.e. return fewer transactions than requested. The requesting node can then request these hashes again.
 
 Transactions that are not in the pool, even if their hash was announced in `KnownPooledTransactions`, should not be returned.
 It is ok to return an empty list in `PooledTransactions` if none of the requested hashes is in the pool.
