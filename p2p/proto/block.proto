@@ -1,6 +1,8 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
 import "p2p/proto/state.proto";
+import "p2p/proto/transaction.proto";
+import "p2p/proto/receipt.proto";
 import "google/protobuf/timestamp.proto";
 
 // for now, we assume a small consensus, so this fits in 1M. Else, these will be repeated
@@ -14,7 +16,7 @@ message Signatures {
 // Note: commitments may change to be for the previous blocks like comet/tendermint
 // hash of block header sent to L1
 message BlockHeader {
-    Hash                      parent_header     = 1;
+    Hash                      parent_hash       = 1;
     uint64                    number            = 2;
     google.protobuf.Timestamp time              = 3;   // TODO: see if this needs to be Felt252 or can be converted
     Address                   sequencer_address = 4;
@@ -29,6 +31,8 @@ message BlockHeader {
     Merkle                    transactions      = 8;   // By order of execution. TBD: required? the client can execute (powerful machine) and match state diff
     Merkle                    events            = 9;   // By order of issuance. TBD: in receipts?
     Merkle                    receipts          = 10;  // By order of issuance.
+    string                    protocol_version  = 11; // Starknet version
+    Felt252                   gas_price         = 12;
 }
 
 message BlockProof {
@@ -45,6 +49,8 @@ message NewBlock {
     }
 }
 
+// Requests a peer's CurrentBlockHeader
+message CurrentBlockHeaderRequest {}
 
 // result is (BlockHeader, Signature?)* in order of creation (incr/dec)
 message BlockHeadersRequest {
@@ -72,10 +78,12 @@ message BlockBodiesResponse {
     optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
 
     oneof body_message {
-        StateDiff  diff    = 2;
-        Classes    classes = 3;
-        BlockProof proof   = 4;
-        Fin        fin     = 5;
+        StateDiff    diff         = 2;
+        Classes      classes      = 3;
+        BlockProof   proof        = 4;
+        Transactions transactions = 5;
+        Receipts     receipts     = 6;
+        Fin          fin          = 7;
     }
 }
 
