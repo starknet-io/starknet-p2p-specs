@@ -11,14 +11,6 @@ message EthereumAddress {
   bytes elements = 1;
 }
 
-message MessageToL2 {
-  EthereumAddress from_address         = 1;
-  repeated        Felt252 payload      = 2;
-  Felt252         to_address           = 3;
-  Felt252         entry_point_selector = 4;
-  Felt252         nonce                = 5;
-}
-
 message Receipt {
   message ExecutionResources {
     message BuiltinCounter {
@@ -43,7 +35,6 @@ message Receipt {
     repeated           MessageToL1 messages_sent     = 3;
     ExecutionResources execution_resources           = 4;
     string             revert_reason                 = 5;
-    optional           MessageToL2 consumed_message  = 6;
   }
 
 
