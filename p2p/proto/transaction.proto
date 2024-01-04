@@ -61,15 +61,16 @@ message Transaction
         Felt252  address_salt     = 2;
         repeated Felt252 calldata = 3;
         uint32   version          = 4;
+        Address  address          = 5;
     }
 
     message DeployAccountV1 {
-        Felt252          max_fee          = 1;
-        AccountSignature signature        = 2;
-        Hash             class_hash       = 3;
-        Felt252          nonce            = 4;
-        Felt252          address_salt     = 5;
-        repeated         Felt252 calldata = 6;
+        Felt252          max_fee                      = 1;
+        AccountSignature signature                    = 2;
+        Hash             class_hash                   = 3;
+        Felt252          nonce                        = 4;
+        Felt252          address_salt                 = 5;
+        repeated         Felt252 constructor_calldata = 6;
     }
 
     // see https://external.integration.starknet.io/feeder_gateway/get_transaction?transactionHash=0x29fd7881f14380842414cdfdd8d6c0b1f2174f8916edcfeb1ede1eb26ac3ef0
