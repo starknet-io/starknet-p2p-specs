@@ -92,7 +92,7 @@ Simple protocol for discovery, based on pub sub implementation (similar to [pubs
 
 
 
-The chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/transactions#chain-id) configured for the node.
+The chain id is the [starknet chain id](https://docs.starknet.io/documentation/architecture_and_concepts/Blocks/transactions/#chain-id) configured for the node.
 
 Note that while technically a node can serve both as a full node and a bootstrap node, this isn't recommended, as bootstrap nodes generally need to be available to serve their discovery role.
 
@@ -158,7 +158,7 @@ Of course, in this case, invalid body or header will invalidate the block (and t
 A node SHOULD disregard body and and state diffs for blocks with invalid headers.
 
 The topic used to publish new blocks will be: `blocks/` + configured chain id.
-Where the configured chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/transactions#chain-id) configured for the node.
+Where the configured chain id is the [starknet chain id](https://docs.starknet.io/documentation/architecture_and_concepts/Blocks/transactions/#chain-id) configured for the node.
 Nodes should subscribe to the topic on initialization.
 
 #### Validation
@@ -177,7 +177,7 @@ Note that this assumes blocks received are blocks that are agreed by the consens
 
 Messages specification is [here](./proto/propagation.proto)
 
-Where contract class hash is defined [here](https://docs.starknet.io/docs/Contracts/contract-hash) and contract address is as defined [here](https://docs.starknet.io/docs/Contracts/contract-address).
+Where contract class hash is defined [here](https://docs.starknet.io/documentation/architecture_and_concepts/Contracts/class-hash/) and contract address is as defined [here](https://docs.starknet.io/documentation/architecture_and_concepts/Contracts/contract-address/).
 
 ----
 
@@ -261,7 +261,7 @@ When a transaction is submitted to a node, e.g. through [the node API](https://g
 the node should transmit the new transaction to peers. Notification of the new transaction is done using pub-sub mechanism, using a topic known a-priori (similar to block propagation).
 
 The topic used to notify of new transactions will be `transaction_pool/` + configured chain id.
-Where the configured chain id is the [starknet chain id](https://docs.starknet.io/docs/Blocks/transactions#chain-id) configured for the node.
+Where the configured chain id is the [starknet chain id](https://docs.starknet.io/documentation/architecture_and_concepts/Blocks/transactions/#chain-id) configured for the node.
 Nodes that maintain a transaction pool should subscribe to the topic on initialization.
 
 The message transmitted should include the complete new transaction.
