@@ -1,6 +1,8 @@
 syntax = "proto3";
 
 import "common.proto";
+import "transaction.proto";
+import "block.proto";
 import "google/protobuf/timestamp.proto";
 
 package consensus;
@@ -8,17 +10,6 @@ package consensus;
 
 // WIP - will change
 
-message Transaction {
-    bytes elements = 1;
-}
-
-message TransactionBatch {
-    repeated Transaction transactions = 1;
-}
-
-message Proof {
-    bytes elements = 1;
-}
 
 message BlockNumber {
     Hash   parent_hash = 1;
@@ -32,11 +23,6 @@ enum Step {
     Precommit = 2;
 }
 
-message Voter {
-    Address address = 1;
-    uint64  weight  = 2;
-}
-
 message Vote {
     enum  VoteType {
         Prevote   = 0;
@@ -47,15 +33,14 @@ message Vote {
     // messages, to make sure the data, and therefore the signature, are unambiguous, since the
     // votes have the same fields.
     VoteType           vote_type    = 1;
-    uint64             fork_id      = 2;
-    BlockNumber        block_number = 3;
-    uint32             round        = 4;
+    BlockNumber        block_number = 2;
+    uint32             round        = 3;
     // This is optional since a vote can be NIL.
-    optional Hash      block_hash   = 5;
+    optional Hash      block_hash   = 4;
     // Identifies the voter.
-    Address            voter        = 6;
+    Address            voter        = 5;
     // Voter's signature of the above fields.
-    ConsensusSignature signature    = 7;
+    ConsensusSignature signature    = 6;
 }
 
 message ProposalInit {
@@ -64,8 +49,8 @@ message ProposalInit {
     uint32                    valid_round    = 3;
     Address                   proposer       = 4;
     google.protobuf.Timestamp timestamp      = 5;
-    // The validator set which can vote on this block.
-    repeated Voter            validators     = 6;
+    // Proposer's signature on the above fields.
+    ConsensusSignature signature = 5;
 }
 
 // Any content in the block itself, which is opaque to the consensus module (e.g. transactions,
@@ -73,8 +58,13 @@ message ProposalInit {
 message ProposalContent {
     oneof content {
         TransactionBatch transactions = 1;
-        Proof            proof        = 2;
+        BlockProof       proof        = 2;
     }
+
+    BlockNumber block_number = 3;
+    uint32      round        = 4;
+    // Proposer's signature on the above fields.
+    ConsensusSignature signature = 5;
 }
 
 message ProposalFin {
@@ -82,16 +72,20 @@ message ProposalFin {
     ConsensusSignature block_signature  = 1;
 }
 
-// A proposal is a stream:
-// 1. The first message is `init`.
-// 2. The next N messages are `content`.
-// 3. The last message is `fin`.
-message Proposal {
+message ProposalPart {
     oneof messages {
         ProposalInit    init    = 1;
         ProposalContent content = 2;
         ProposalFin     fin     = 3;
     }
+}
+
+// A proposal is a stream:
+// 1. The first message is `init`.
+// 2. The next N messages are `content`.
+// 3. The last message is `fin`.
+message ProposalMessage {
+    repeated ProposalPart parts = 1;
 }
 
 message CertificateInit {
