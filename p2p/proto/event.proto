@@ -2,10 +2,11 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 
 message Event {
-    Hash transaction_hash = 1;
-    Felt252  from_address = 2;
-    repeated Felt252 keys = 3;
-    repeated Felt252 data = 4;
+    uint64 transaction_index = 1; // Transaction index inside the current block that this event was emitted from.
+    Hash event_hash = 2
+    Felt252 from_address = 3;
+    repeated Felt252 keys = 4;
+    repeated Felt252 data = 5;
 }
 
 message EventsRequest {
