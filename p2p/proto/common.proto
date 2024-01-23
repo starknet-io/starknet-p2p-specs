@@ -46,7 +46,7 @@ message BlockID {
     Hash   header = 2;
 }
 
-enum L1DataAvailabilityMode {
+enum DataAvailabilityMode {
     Calldata = 0;
     Blob = 1;
 }
