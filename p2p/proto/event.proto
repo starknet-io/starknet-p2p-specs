@@ -3,9 +3,9 @@ import "p2p/proto/common.proto";
 
 message Event {
     Hash transaction_hash = 1;
-    Felt252  from_address = 2;
-    repeated Felt252 keys = 3;
-    repeated Felt252 data = 4;
+    Felt252 from_address = 3;
+    repeated Felt252 keys = 4;
+    repeated Felt252 data = 5;
 }
 
 message EventsRequest {
