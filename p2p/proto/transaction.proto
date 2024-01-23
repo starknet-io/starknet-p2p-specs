@@ -1,5 +1,6 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
+import "p2p/proto/receipt.proto";
 
 message ResourceLimits {
     Felt252 max_amount = 1;
@@ -15,6 +16,8 @@ message AccountSignature {
     repeated Felt252 parts = 1;
 }
 
+// This is a transaction that is already accepted in a block. Once we have a mempool, we will define
+// a separate message for BroadcastedTransaction.
 message Transaction
 {
     message DeclareV0 {
@@ -38,7 +41,7 @@ message Transaction
         AccountSignature signature = 3;
         Hash class_hash = 4;
         Felt252 nonce = 5;
-        Felt252 compiled_class_hash = 6;
+        Hash compiled_class_hash = 6;
     }
 
     // see https://external.integration.starknet.io/feeder_gateway/get_transaction?transactionHash=0x41d1f5206ef58a443e7d3d1ca073171ec25fa75313394318fc83a074a6631c3
@@ -47,13 +50,13 @@ message Transaction
         AccountSignature signature = 2;
         Hash class_hash = 3;
         Felt252 nonce = 4;
-        Felt252 compiled_class_hash = 5;
+        Hash compiled_class_hash = 5;
         ResourceBounds resource_bounds = 6;
-        Felt252 tip = 7;
-        Address paymaster_data = 8;
-        Address account_deployment_data = 9;
-        string nonce_domain = 10; // rename to nonce_data_availability_mode ?
-        string fee_domain = 11; // rename to fee_data_availability_mode ?
+        uint64 tip = 7;
+        repeated Felt252 paymaster_data = 8;
+        repeated Felt252 account_deployment_data = 9;
+        L1DataAvailabilityMode nonce_data_availability_mode = 10;
+        L1DataAvailabilityMode fee_data_availability_mode = 11;
     }
 
     message Deploy {
@@ -80,10 +83,10 @@ message Transaction
         Felt252 address_salt = 4;
         repeated Felt252 calldata = 5;
         ResourceBounds resource_bounds = 6;
-        Felt252 tip = 7;
-        Address paymaster_data = 8;
-        string nonce_domain = 9;  // rename to nonce_data_availability_mode ?
-        string fee_domain = 10; // rename to fee_data_availability_mode ?
+        uint64 tip = 7;
+        repeated Felt252 paymaster_data = 8;
+        L1DataAvailabilityMode nonce_data_availability_mode = 9;
+        L1DataAvailabilityMode fee_data_availability_mode = 10;
     }
 
     message InvokeV0 {
@@ -108,11 +111,11 @@ message Transaction
         AccountSignature signature = 2;
         repeated Felt252 calldata = 3;
         ResourceBounds resource_bounds = 4;
-        Felt252 tip = 5;
-        Address paymaster_data = 6;
-        Address account_deployment_data = 7;
-        string nonce_domain = 8;  // rename to nonce_data_availability_mode ?
-        string fee_domain = 9;  // rename to fee_data_availability_mode ?
+        uint64 tip = 5;
+        repeated Felt252 paymaster_data = 6;
+        repeated Felt252 account_deployment_data = 7;
+        L1DataAvailabilityMode nonce_data_availability_mode = 8;
+        L1DataAvailabilityMode fee_data_availability_mode = 9;
         Felt252 nonce = 10;
     }
 
@@ -136,7 +139,11 @@ message Transaction
         InvokeV3 invoke_v3 = 10;
         L1HandlerV0 l1_handler = 11;
     }
-    Hash transaction_hash = 12;
+}
+
+message TransactionWithReceipt {
+    Transaction transaction = 1;
+    Receipt receipt = 2;
 }
 
 // TBD: can support a flag to return tx hashes only, good for standalone mempool to remove them,
@@ -145,10 +152,11 @@ message TransactionsRequest {
     Iteration iteration = 1;
 }
 
-// Responses are sent ordered by the order given in the request.
+// Responses are sent ordered by the order given in the request. The order inside each block is
+// according to the execution order.
 message TransactionsResponse {
     oneof transaction_message {
-        Transaction transaction = 1;
+        TransactionWithReceipt transaction_with_receipt = 1;
         Fin fin = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its transactions.
     }
 }
