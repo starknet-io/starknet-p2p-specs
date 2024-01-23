@@ -2,9 +2,14 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 
 message MessageToL1 {
-  Felt252 from_address = 1;
-  repeated Felt252 payload = 2;
-  EthereumAddress to_address = 3;
+  Felt252 from_address = 2;
+  repeated Felt252 payload = 3;
+  EthereumAddress to_address = 4;
+}
+
+enum PriceUnit {
+    Wei = 0;
+    Fri = 1;
 }
 
 message EthereumAddress {
@@ -32,11 +37,11 @@ message Receipt {
   }
 
   message Common {
-    Hash transaction_hash = 1;
     Felt252 actual_fee = 2;
-    repeated MessageToL1 messages_sent = 3;
-    ExecutionResources execution_resources = 4;
-    string revert_reason = 5;
+    PriceUnit price_unit = 3;
+    repeated MessageToL1 messages_sent = 4;
+    ExecutionResources execution_resources = 5;
+    optional string revert_reason = 6;
   }
 
 
@@ -70,16 +75,4 @@ message Receipt {
     Deploy deprecated_deploy = 4;
     DeployAccount deploy_account = 5;
   }
-}
-
-message ReceiptsRequest {
-  Iteration iteration = 1;
-}
-
-// Responses are sent ordered by the order given in the request.
-message ReceiptsResponse {
-    oneof receipt_message {
-        Receipt receipt = 1;
-        Fin fin = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its receipts.
-    }
 }
