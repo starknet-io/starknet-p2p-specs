@@ -78,11 +78,10 @@ message Receipts {
     repeated Receipt items = 2;
 }
 
+// Responses are sent ordered by the order given in the request.
 message ReceiptsResponse {
-  optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
-
-  oneof responses {
-    Receipts receipts = 2;
-    Fin      fin      = 3;
-  }
+    oneof receipt_message {
+        Receipt receipt = 1;
+        Fin     fin     = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its receipts.
+    }
 }
