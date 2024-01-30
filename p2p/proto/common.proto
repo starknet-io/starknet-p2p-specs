@@ -58,17 +58,4 @@ message Iteration {
 
 // mark the end of a stream of messages
 // TBD: may not be required if we open a stream per request.
-message Fin {
-    enum Error {
-        busy     = 0;
-        too_much = 1;
-        unknown  = 2;
-        pruned   = 3;
-    }
-    optional Error error = 1;
-}
-
-
-
-
-
+message Fin {}
