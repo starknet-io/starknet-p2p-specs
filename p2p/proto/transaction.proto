@@ -136,6 +136,7 @@ message Transaction
         InvokeV3        invoke_v3         = 10;
         L1HandlerV0     l1_handler        = 11;
     }
+    Hash transaction_hash = 12;
 }
 
 // TBD: can support a flag to return tx hashes only, good for standalone mempool to remove them,
@@ -144,16 +145,10 @@ message TransactionsRequest {
     Iteration iteration = 1;
 }
 
-// can be several in a single reply
-message Transactions {
-    repeated Transaction items = 1;
-}
-
+// Responses are sent ordered by the order given in the request.
 message TransactionsResponse {
-    optional BlockID id = 1; // may not appear if Fin is sent to end the whole response
-
-    oneof responses {
-        Transactions transactions = 2;
-        Fin          fin          = 3;
+    oneof transaction_message {
+        Transaction transaction = 1;
+        Fin         fin         = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its transactions.
     }
 }
