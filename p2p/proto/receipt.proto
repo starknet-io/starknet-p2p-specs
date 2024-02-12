@@ -27,6 +27,8 @@ message Receipt {
     BuiltinCounter builtins = 1;
     uint32 steps = 2;
     uint32 memory_holes = 3;
+    Felt252 l1_gas = 4;
+    Felt252 l1_data_gas = 5;
   }
 
   message Common {
@@ -72,10 +74,6 @@ message Receipt {
 
 message ReceiptsRequest {
   Iteration iteration = 1;
-}
-
-message Receipts {
-    repeated Receipt items = 2;
 }
 
 // Responses are sent ordered by the order given in the request.
