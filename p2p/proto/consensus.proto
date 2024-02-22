@@ -5,8 +5,6 @@ import "transaction.proto";
 import "block.proto";
 import "google/protobuf/timestamp.proto";
 
-package consensus;
-
 
 // WIP - will change
 
@@ -46,19 +44,19 @@ message Vote {
 message ProposalInit {
     BlockNumber               block_number   = 1;
     uint32                    proposal_round = 2;
-    uint32                    valid_round    = 3;
+    optional uint32           valid_round    = 3;
     Address                   proposer       = 4;
     google.protobuf.Timestamp timestamp      = 5;
     // Proposer's signature on the above fields.
-    ConsensusSignature signature = 5;
+    ConsensusSignature        signature      = 6;
 }
 
 // Any content in the block itself, which is opaque to the consensus module (e.g. transactions,
 // proofs, gas price, etc.)
 message ProposalContent {
     oneof content {
-        TransactionBatch transactions = 1;
-        BlockProof       proof        = 2;
+        Transactions transactions = 1;
+        BlockProof   proof        = 2;
     }
 
     BlockNumber block_number = 3;
@@ -68,8 +66,9 @@ message ProposalContent {
 }
 
 message ProposalFin {
-    // Proposer's signature of `block_hash`.
-    ConsensusSignature block_signature  = 1;
+    Hash               block_hash       = 1;
+    // Proposer's signature of (block_number, round, block_hash).
+    ConsensusSignature block_signature  = 2;
 }
 
 message ProposalPart {
@@ -90,10 +89,11 @@ message ProposalMessage {
 
 message CertificateInit {
     ProposalInit       init             = 1;
-    // Votes of 1 type which form a quorum in favor of the proposal.
-    repeated Vote      votes            = 2;
-    // Proposer's signature of `block_hash`.
+    Hash               block_hash       = 2;
+    // Proposer's signature of (block_number, round, block_hash).
     ConsensusSignature block_signature  = 3;
+    // Votes of 1 type which form a quorum in favor of the proposal.
+    repeated Vote      votes            = 4;
 }
 
 // A proposal is a stream:
