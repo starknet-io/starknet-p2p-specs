@@ -9,7 +9,7 @@ import "google/protobuf/timestamp.proto";
 // WIP - will change
 
 
-message BlockNumber {
+message BlockLocation {
     Hash   parent_hash = 1;
     uint64 height      = 2;
     uint64 fork_id     = 3;
@@ -30,19 +30,19 @@ message Vote {
     // We use a type field to distinguish between prevotes and precommits instead of different
     // messages, to make sure the data, and therefore the signature, are unambiguous, since the
     // votes have the same fields.
-    VoteType           vote_type    = 1;
-    BlockNumber        block_number = 2;
-    uint32             round        = 3;
+    VoteType           vote_type      = 2;
+    BlockLocation      block_location = 3;
+    uint32             round          = 4;
     // This is optional since a vote can be NIL.
-    optional Hash      block_hash   = 4;
+    optional Hash      block_hash     = 5;
     // Identifies the voter.
-    Address            voter        = 5;
+    Address            voter          = 6;
     // Voter's signature of the above fields.
-    ConsensusSignature signature    = 6;
+    ConsensusSignature signature      = 7;
 }
 
 message ProposalInit {
-    BlockNumber               block_number   = 1;
+    BlockLocation             block_location = 1;
     uint32                    proposal_round = 2;
     optional uint32           valid_round    = 3;
     Address                   proposer       = 4;
@@ -51,7 +51,7 @@ message ProposalInit {
     ConsensusSignature        signature      = 6;
 }
 
-// Any content in the block itself, which is opaque to the consensus module (e.g. transactions,
+// The primary content of the block. This is opaque to the consensus module (e.g. transactions,
 // proofs, gas price, etc.)
 message ProposalContent {
     oneof content {
@@ -59,15 +59,16 @@ message ProposalContent {
         BlockProof   proof        = 2;
     }
 
-    BlockNumber block_number = 3;
-    uint32      round        = 4;
-    // Proposer's signature on the above fields.
-    ConsensusSignature signature = 5;
+    // The sequence number of this content within the proposal.
+    uint32 sequence_number        = 3;
+
+    // Proposal builder's signature on the above fields.
+    ConsensusSignature signature  = 4;
 }
 
 message ProposalFin {
     Hash               block_hash       = 1;
-    // Proposer's signature of (block_number, round, block_hash).
+    // Proposer's signature of (block_location, round, block_hash).
     ConsensusSignature block_signature  = 2;
 }
 
@@ -90,7 +91,7 @@ message ProposalMessage {
 message CertificateInit {
     ProposalInit       init             = 1;
     Hash               block_hash       = 2;
-    // Proposer's signature of (block_number, round, block_hash).
+    // Proposer's signature of (block_location, round, block_hash).
     ConsensusSignature block_signature  = 3;
     // Votes of 1 type which form a quorum in favor of the proposal.
     repeated Vote      votes            = 4;
@@ -107,9 +108,12 @@ message Certificate {
 }
 
 message PeerState {
-    BlockNumber        block_number = 1;
-    uint32             round        = 2;
-    Step               step         = 3;
-    uint32             valid_round  = 4;
-    Hash               valid_value  = 5;
+    BlockLocation      block_location = 1;
+    uint32             round          = 2;
+    Step               step           = 3;
+    uint32             valid_round    = 4;
+    Hash               valid_value    = 5;
+    Address            sender         = 6;
+    // Sender's signature on the above fields.
+    ConsensusSignature signature      = 7;
 }
