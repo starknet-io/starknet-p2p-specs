@@ -16,6 +16,6 @@ message EventsRequest {
 message EventsResponse {
     oneof event_message {
         Event event = 1;
-        Fin   fin   = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its events.
+        Fin fin = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its events.
     }
 }
