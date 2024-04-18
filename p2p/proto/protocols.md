@@ -1,7 +1,7 @@
 ## Protocols Breakdown
 | Protocol | Name (for negotiation) | Request Message | Response Message |
 | ------------ | -------------- | -------------- | -------------- |
-| Headers | /starknet/headers/1 | [BlockHeadersRequest](./block.proto) | [BlockHeadersResponse](./block.proto) |
+| Headers | /starknet/headers/1 | [BlockHeadersRequest](./header.proto) | [BlockHeadersResponse](./header.proto) |
 | StateDiffs | /starknet/state_diffs/1 | [StateDiffsRequest](./state.proto) | [StateDiffsResponse](./state.proto) |
 | Classes | /starknet/classes/1 | [ClassesRequest](./class.proto) | [ClassesResponse](./class.proto) |
 | Transactions | /starknet/transactions/1 | [TransactionsRequest](./transaction.proto) | [TransactionsResponse](./transaction.proto) |
