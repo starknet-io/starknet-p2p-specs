@@ -16,29 +16,29 @@ message BlockLocation {
 }
 
 enum Step {
-    Propose = 0;
-    Prevote = 1;
-    Precommit = 2;
+    Propose = 1;
+    Prevote = 2;
+    Precommit = 3;
 }
 
 message Vote {
     enum  VoteType {
-        Prevote   = 0;
-        Precommit = 1;
+        Prevote   = 1;
+        Precommit = 2;
     };
 
     // We use a type field to distinguish between prevotes and precommits instead of different
     // messages, to make sure the data, and therefore the signature, are unambiguous, since the
     // votes have the same fields.
-    VoteType           vote_type      = 2;
-    BlockLocation      block_location = 3;
-    uint32             round          = 4;
+    VoteType           vote_type      = 3;
+    BlockLocation      block_location = 4;
+    uint32             round          = 5;
     // This is optional since a vote can be NIL.
-    optional Hash      block_hash     = 5;
+    optional Hash      block_hash     = 6;
     // Identifies the voter.
-    Address            voter          = 6;
+    Address            voter          = 7;
     // Voter's signature of the above fields.
-    ConsensusSignature signature      = 7;
+    ConsensusSignature signature      = 8;
 }
 
 message ProposalInit {
@@ -46,33 +46,44 @@ message ProposalInit {
     uint32                    proposal_round = 2;
     optional uint32           valid_round    = 3;
     Address                   proposer       = 4;
-    google.protobuf.Timestamp timestamp      = 5;
     // Proposer's signature on the above fields.
-    ConsensusSignature        signature      = 6;
+    ConsensusSignature        signature      = 5;
 }
 
-// The primary content of the block. This is opaque to the consensus module (e.g. transactions,
-// proofs, gas price, etc.)
+// The primary content of the block. This is opaque to the consensus module.
 message ProposalContent {
     oneof content {
-        Transactions transactions = 1;
-        BlockProof   proof        = 2;
+        Transactions  transactions        = 1;
+        BlockProof    proof               = 2;
+        // A list of precommits which supported the previous block. When `H+1` is decided this will
+        // become the canonical set of precommits for H which will determine the rewards.
+        //
+        // Note that the proof for `H` included in `H+K` or sent to L1 doesn't depend on this, as
+        // it merely commits us to the statement that "H had a quorum of precommits from Validators"
+        // without any commitment to the specific set of precommits used to prove that.
+        repeated Vote previous_precommits = 3;
     }
 
     // The sequence number of this content within the proposal.
-    uint32 sequence_number        = 3;
+    uint32 sequence_number                = 4;
 
     // Proposal builder's signature on the above fields.
-    ConsensusSignature signature  = 4;
+    ConsensusSignature signature          = 5;
 }
 
 message ProposalFin {
+    // The `block_hash` is here for convenience. It should also be calculated from the content by
+    // validators.
     Hash               block_hash       = 1;
-    // Proposer's signature of (block_location, round, block_hash).
+    // Proposer's signature of (block_location, proposal_round, valid_round, block_hash).
     ConsensusSignature block_signature  = 2;
 }
 
-message ProposalPart {
+// A proposal is a stream:
+// 1. The first message is `init`.
+// 2. The next N messages are `content`.
+// 3. The last message is `fin`.
+message Proposal {
     oneof messages {
         ProposalInit    init    = 1;
         ProposalContent content = 2;
@@ -80,29 +91,53 @@ message ProposalPart {
     }
 }
 
-// A proposal is a stream:
-// 1. The first message is `init`.
-// 2. The next N messages are `content`.
-// 3. The last message is `fin`.
-message ProposalMessage {
-    repeated ProposalPart parts = 1;
-}
-
-message CertificateInit {
+// The block_hash in all signatures must be verified against the block_hash calculated from the
+// content.
+message LockCertificateInit {
     ProposalInit       init             = 1;
-    Hash               block_hash       = 2;
     // Proposer's signature of (block_location, round, block_hash).
-    ConsensusSignature block_signature  = 3;
-    // Votes of 1 type which form a quorum in favor of the proposal.
-    repeated Vote      votes            = 4;
+    ConsensusSignature block_signature  = 2;
+    // Prevotes forming a quorum in favor of this proposal.
+    repeated Vote      prevotes         = 3;
 }
 
-// A proposal is a stream:
+// A Lock is a stream:
 // 1. The first message is `init`.
 // 2. The next N messages are `content`.
-message Certificate {
+//
+// A decision certificate's `init` alone is useful, as this is enough for a node to accept a block.
+// A lock certificate on the other hand is useless without the content, since a node must validate
+// a block's content before it can vote in favor of it.
+message LockCertificate {
     oneof messages {
-        CertificateInit init    = 1;
+        LockCertificateInit init    = 1;
+        ProposalContent content = 2;
+    }
+}
+
+message DecisionCertificateInit {
+    // block_hash can be calculated from `header`.
+    BlockHeader        header           = 1;
+    // Precommits forming a quorum in favor of this proposal.
+    repeated Vote      precommits       = 3;
+    // Proposer's signature of (block_location, round, block_hash).
+    // - block_hash - from header
+    // - block_location - from header
+    // - round - from precommits
+    // - the proposer is derived from (block_location, round)
+    ConsensusSignature block_signature  = 2;
+}
+
+// A DecisionCertificate is a stream:
+// 1. The first message is `init`.
+// 2. The next N messages are `content`.
+//
+// A decision certificate's `init` alone is useful, as this is enough for a node to accept a block.
+// The content is needed if the node wants to validate the block's content, store transactions, or
+// build a proof.
+message DecisionCertificate {
+    oneof messages {
+        DecisionCertificateInit init    = 1;
         ProposalContent content = 2;
     }
 }
