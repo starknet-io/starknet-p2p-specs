@@ -16,7 +16,6 @@ message Vote {
     // messages, to make sure the data, and therefore the signatures, are unambiguous between
     // Prevote and Precommit.
     VoteType           vote_type    = 1;
-    Hash               parent_hash  = 2;
     uint64             block_number = 3;
     uint64             fork_id      = 4;
     uint32             round        = 5;
@@ -27,22 +26,22 @@ message Vote {
 }
 
 message ProposalInit {
-    Hash    parent_hash    = 1;
     uint64  block_number   = 2;
     uint64  fork_id        = 3;
     uint32  proposal_round = 4;
-    Address proposer       = 5;
 }
 
 // Finalize the Tendermint Proposal. When a validator receives this message it will presume that no
-// more content for the proposal should be sent.
-// - The signature supplied with ProposalFin should be for the full Tendermint proposal, meaning it
-//   it includes the the fields present here as well as those in `ProposalInit` (with the exception
-//   of `ProposalInit::proposer`).
+// more content for the proposal should be sent. The signature supplied with ProposalFin should be
+// for the full Tendermint proposal:
+// 1. height
+// 2. fork_id
+// 3. proposal_round
+// 4. valid_round
+// 5. block_hash - the validator calculates the block_hash on its own from the content stream and
+//    confirms the signature with that value.
 message ProposalFin {
     optional uint32 valid_round    = 1;
-    // Validators must verify this matches the block_hash they calculated from the content.
-    Hash            block_hash     = 2;
 }
 
 // The timestamp of a proposal can impact consensus, specifically the lower bound applied. If nodes
