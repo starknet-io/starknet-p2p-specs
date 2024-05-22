@@ -51,14 +51,14 @@ message ProposalFin {
 // problem.
 message Proposal {
     oneof messages {
-        ProposalInit init         = 1;
-        ProposalFin  fin          = 2;
+        ProposalInit          init         = 1;
+        ProposalFin           fin          = 2;
         // Once block `H` is decided there remains a question; which set of validators receive a
         // reward? More specifically, what is the canonical set of precommits for block `H`? Our
         // current plan is for the proposer to set the first transaction in `H+1` to be writing the
         // list of precommits for `H` to the staking contract in startknet.
-        Transactions transactions = 3;
-        BlockProof   proof        = 4;
+        BroadcastTransactions transactions = 3;
+        BlockProof            proof        = 4;
     }
 }
 
