@@ -48,3 +48,7 @@ message BlockHeadersResponse {
         Fin fin = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its header.
     }
 }
+
+message BlockProof {
+    repeated bytes proof = 1;
+}
