@@ -1,19 +1,51 @@
 syntax = "proto3";
 
 import "p2p/proto/common.proto";
+import "google/protobuf/descriptor.proto";
 
-// do we need this? capabilities are protocols (but need arguments, e.g. history length)
-/*
-message NewNode
+extend google.protobuf.MessageOptions {
+    optional bytes powDifficulty = 1001;
+}
+
+message MultiAddress {
+    bytes value = 1;
+}
+
+message Capability {
+    string protocol = 1;
+    repeated string params = 2; // additional parameters per protocol. for sync protocols it is the pruning level where
+                                // none means no pruning (archive node)
+}
+
+message Pow {
+    // ~10 seconds on a single CPU
+    option (powDifficulty) = "0x1000000000000000000000000000000000000000000000000000000000000";
+
+    bytes blockHash = 1; // one of the accepted block hashes in the underlying layer.
+                         // accepted is currently the current last or one before it.
+    bytes salt = 2;  // a salt such that keccak(salt||blockHash)
+}
+
+// send when joining and periodically (period TBD)
+message Node
 {
     PeerID id = 1;
+    repeated MultiAddress addresses = 2;
+    repeated Capability capabilities = 3;
 
-    repeated string capabilities = 2;
+    Pow pow = 4;
 }
 
-message KnownNodes
+// when a node joins it can ask peers for the nodes they know
+message NodesRequest {
+    // this can be used to request for peer information when only its id is known. The number of ids is limited (TBD)
+    repeated PeerID ids = 1;
+}
+
+message NodesResponse
 {
-    PeerID id = 1; //id of publishing node
-    repeated PeerID nodes = 2; //nodes known to the publishing node
+    // a selection of nodes the peer knows. Limited (TBD exact number) and should comprise from "best" nodes plus a
+    // random selection (to avoid islands)
+    repeated Node nodes = 1;
 }
-*/
+
