@@ -19,7 +19,7 @@ message Capability {
 }
 
 message Pow {
-    // ~10 seconds on a single CPU
+    // ~10 seconds on a single CPU. 2^240 out of 2^256, so 16 bits of difficulty.
     option (powDifficulty) = "0x200000000000000000000000000000000000000000000000000000000000";
 
     bytes blockHash = 1; // one of the accepted block hashes in the underlying layer (ethereum in starknet).
