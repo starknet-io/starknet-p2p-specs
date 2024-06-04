@@ -46,7 +46,7 @@ message NodesRequest {
 
 message NodesResponse
 {
-    // a selection of random nodes the peer knows. Limited (TBD exact number). 
+    // a selection of random nodes the peer knows. Limited (TBD exact number).
     repeated Node nodes = 1;
 }
 
