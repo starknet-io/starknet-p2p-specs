@@ -20,7 +20,7 @@ message Capability {
 
 message Pow {
     // ~10 seconds on a single CPU
-    option (powDifficulty) = "0x1000000000000000000000000000000000000000000000000000000000000";
+    option (powDifficulty) = "0x200000000000000000000000000000000000000000000000000000000000";
 
     bytes blockHash = 1; // one of the accepted block hashes in the underlying layer (ethereum in starknet).
                          // accepted is currently the current last or one before it.
