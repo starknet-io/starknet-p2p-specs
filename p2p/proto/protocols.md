@@ -23,7 +23,7 @@ negotiation, and the protobuf messages related to the protocol.
 | Classes | /starknet/classes/0.1.0-rc.0 | [ClassesRequest](./class.proto) | [ClassesResponse](./class.proto) |
 | Transactions | /starknet/transactions/0.1.0-rc.0 | [TransactionsRequest](./transaction.proto) | [TransactionsResponse](./transaction.proto) |
 | Events | /starknet/events/0.1.0-rc.0 | [EventsRequest](./event.proto) | [EventsResponse](./event.proto) |
-| Kademlia (for discovery) | /starknet/kad/<chain_id>/1.0.0 |
+| Kademlia (for discovery) | /starknet/<chain_id>/kad/1.0.0 |
 
 In addition, nodes should also support the `Identify` protocol, who's name for negotiation is
 `/ipfs/id/1.0.0`
