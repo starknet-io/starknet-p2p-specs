@@ -17,19 +17,19 @@
 
 ## Overview
 
-This Node document aims to provide an overview and necessary details for implementing the P2P protocol for Starknet nodes.
+This document aims to provide an overview and necessary details for implementing the P2P protocol for Starknet nodes.
 
 Familiarity with [Starknet](https://starknet.io/) is assumed.
 
 ### Document Conventions
 
-Unless otherwise noted, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL", NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in This Node document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
+Unless otherwise noted, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL", NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](https://datatracker.ietf.org/doc/html/rfc2119).
 
 ## Core Definitions
 
-As a guiding principle, we leverage [libp2p](https://libp2p.io/) set of [protocols](https://github.com/libp2p/specs) whenever possible. This Node will let us standardize the protocol. It will also allow node implementations to leverage existing implementations of libp2p, or switch between them if necessary.
+As a guiding principle, we leverage [libp2p](https://libp2p.io/) set of [protocols](https://github.com/libp2p/specs) whenever possible. This will let us standardize the protocol. It will also allow node implementations to leverage existing implementations of libp2p, or switch between them if necessary.
 
-As a design choice This Node results in some loss of generality, but seems like a reasonable given that libp2p is becoming a de-facto standard, and we see little value in re-implementing (and re-inventing) lower level network communication protocols.
+As a design choice this results in some loss of generality, but seems like a reasonable given that libp2p is becoming a de-facto standard, and we see little value in re-implementing (and re-inventing) lower level network communication protocols.
 
 Specifically, we identify nodes and address them using [Peer IDs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md), with key pairs derived using [Ed25519](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#ed25519) scheme.
 
@@ -49,7 +49,7 @@ Agent versions SHOULD follow [semantic versioning](http://semver.org) format.
 ### Message Encoding
 
 Use protobuf (`proto3`) for message encoding/decoding between peers.
-Specific message schemas to be defined for each protocol.
+Specific message schemas are to be defined for each protocol.
 
 Messages that tie into other messages in one flow, i.e. messages expecting a response and providing a response MUST include a `request_id` (a positive integer) that allows nodes to correlate messages in the same flow.
 The request id, together with the sender id, should be enough for identifying the flow.
