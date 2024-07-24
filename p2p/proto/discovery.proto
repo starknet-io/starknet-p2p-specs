@@ -14,8 +14,9 @@ message MultiAddress {
 // advertise what queries a peer can reply to (it can always query others for whatever it wants)
 message Capability {
     string protocol = 1;
-    repeated string params = 2; // additional parameters per protocol. for sync protocols it is the pruning level where
-                                // none means no pruning (archive node)
+    bytes capability = 2; // The content of the capability.
+                          // It should be the encoding of a protobuf message without length prefix.
+                          // The type of message is deduced from the protocol.
 }
 
 message Pow {
