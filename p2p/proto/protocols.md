@@ -18,11 +18,11 @@ The following table describes the different protocols in Starknet, the name that
 negotiation, and the protobuf messages related to the protocol.
 | Protocol | Name (for negotiation) | Request Message | Response Message |
 | ------------ | -------------- | -------------- | -------------- |
-| Headers | /starknet/headers/0.1.0-rc.0 | [BlockHeadersRequest](./header.proto) | [BlockHeadersResponse](./header.proto) |
-| StateDiffs | /starknet/state_diffs/0.1.0-rc.0 | [StateDiffsRequest](./state.proto) | [StateDiffsResponse](./state.proto) |
-| Classes | /starknet/classes/0.1.0-rc.0 | [ClassesRequest](./class.proto) | [ClassesResponse](./class.proto) |
-| Transactions | /starknet/transactions/0.1.0-rc.0 | [TransactionsRequest](./transaction.proto) | [TransactionsResponse](./transaction.proto) |
-| Events | /starknet/events/0.1.0-rc.0 | [EventsRequest](./event.proto) | [EventsResponse](./event.proto) |
+| Headers | /starknet/headers/0.1.0 | [BlockHeadersRequest](./header.proto) | [BlockHeadersResponse](./header.proto) |
+| StateDiffs | /starknet/state_diffs/0.1.0 | [StateDiffsRequest](./state.proto) | [StateDiffsResponse](./state.proto) |
+| Classes | /starknet/classes/0.1.0 | [ClassesRequest](./class.proto) | [ClassesResponse](./class.proto) |
+| Transactions | /starknet/transactions/0.1.0 | [TransactionsRequest](./transaction.proto) | [TransactionsResponse](./transaction.proto) |
+| Events | /starknet/events/0.1.0 | [EventsRequest](./event.proto) | [EventsResponse](./event.proto) |
 | Kademlia (for discovery) | /starknet/kad/<chain_id>/1.0.0 |
 
 In addition, nodes should also support the `Identify` protocol, who's name for negotiation is
@@ -135,10 +135,10 @@ Starknet chains, where every hash is calculated with the v0.13.2 formula.
 ### Headers
 The Headers protocol is used to download block headers and signatures.
 
-Its name for negotiation is `/starknet/headers/0.1.0-rc.0`
+Its name for negotiation is `/starknet/headers/0.1.0`
 
 Each single message is a fin or a [SignedBlockHeader](./header.proto)
-
+_
 A header is comprised of:
 * block hash
 * hash of the parent block
@@ -154,7 +154,7 @@ header.
 ### Transactions and Receipts
 The transactions protocol is used to download the transactions and receipts in a range of blocks.
 
-Its name for negotiation is `/starknet/transactions/0.1.0-rc.0`
+Its name for negotiation is `/starknet/transactions/0.1.0`
 
 Each single message is either a fin, or a [TransactionWithReceipt](./transaction.proto)
 (A pair of [Transaction](./transaction.proto) and [Receipt](./receipt.proto))
@@ -190,7 +190,7 @@ amounts in the headers of the requested blocks.
 ### Events
 The Events protocol is used to download the events emitted in a range of blocks.
 
-Its name for negotiation is `/starknet/events/0.1.0-rc.0`
+Its name for negotiation is `/starknet/events/0.1.0`
 
 Each single message is a fin or an [Event](./event.proto)
 
@@ -216,7 +216,7 @@ requested blocks.
 The state diff protocol is used to download the state diffs created by a range of blocks.
 It can be used to avoid running the transactions for computing the state diff.
 
-Its name for negotiation is `/starknet/state_diffs/0.1.0-rc.0`
+Its name for negotiation is `/starknet/state_diffs/0.1.0`
 
 In order to verify the state diff, the node needs to calculate its hash and compare it to the
 `state_diff_commitment` field in the block header. The structure of the hash is detailed [here](https://community.starknet.io/t/introducing-p2p-authentication-and-mismatch-resolution-in-v0-12-2/97993)
@@ -257,7 +257,7 @@ and by 1 if the field `class_hash` is present, and by 1 if the field `nonce` is 
 ### Classes
 The classes protocol is used to download the classes declared in a range of blocks.
 
-Its name for negotiation is `/starknet/classes/0.1.0-rc.0`
+Its name for negotiation is `/starknet/classes/0.1.0`
 
 Each single message is a fin or a [Class](./class.proto). For more information on classes, see
 [here](https://docs.starknet.io/documentation/architecture_and_concepts/Smart_Contracts/contract-classes/)
