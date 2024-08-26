@@ -23,6 +23,8 @@ message Vote {
     optional Hash      block_hash   = 6;
     // Identifies the voter.
     Address            voter        = 7;
+    // Signature by the voter.
+    ConsensusSignature signature    = 8;
 }
 
 message ProposalInit {
@@ -60,5 +62,7 @@ message ProposalPart {
         Transactions transactions = 3;
         BlockProof   proof        = 4;
     }
+    // Signature by the proposer.
+    ConsensusSignature signature    = 5;
 }
 
