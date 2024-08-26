@@ -62,11 +62,3 @@ message Proposal {
     }
 }
 
-message ConsensusMessage {
-    oneof messages {
-        Vote     vote     = 1;
-        Proposal proposal = 2;
-    }
-    // Signature by the initial sender (e.g. proposer, voter) of the message.
-    ConsensusSignature signature    = 3;
-}
