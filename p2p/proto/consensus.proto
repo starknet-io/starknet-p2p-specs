@@ -49,7 +49,7 @@ message ProposalFin {
 // `R` proposal P is locked. Then in a later round the timestamp in P has gone stale. Therefore the
 // lower bound should be "greater than the previous timestamp". Upper bounds don't suffer from this
 // problem.
-message Proposal {
+message ProposalPart {
     oneof messages {
         ProposalInit init         = 1;
         ProposalFin  fin          = 2;
