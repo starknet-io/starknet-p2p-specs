@@ -1,5 +1,3 @@
-
-
 # Starknet P2P Protocol
 
 **Content**
@@ -28,7 +26,7 @@ Unless otherwise noted, the key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "
 
 As a guiding principle, we leverage [libp2p](https://libp2p.io/) set of [protocols](https://github.com/libp2p/specs) whenever possible. This will let us standardize the protocol. It will also allow node implementations to leverage existing implementations of libp2p, or switch between them if necessary.
 
-As a design choice this results in some loss of generality, but seems like a reasonable given that libp2p is becoming a de-facto standard, and we see little value in re-implementing (and re-inventing) lower level network communication protocols.
+As a design choice, this results in some loss of generality, but seems like a reasonable given that libp2p is becoming a de-facto standard, and we see little value in re-implementing (and re-inventing) lower-level network communication protocols.
 
 Specifically, we identify nodes and address them using [Peer IDs](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md), with key pairs derived using [Ed25519](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#ed25519) scheme.
 
@@ -36,7 +34,7 @@ Communication will be done over TCP transport.
 
 ### Identifying Nodes
 
-An [`Identify` message](https://github.com/libp2p/specs/blob/master/identify/README.md) should include the following fields
+An [`Identify` message](https://github.com/libp2p/specs/blob/master/identify/README.md) should include the following fields:
 
 `protocolVersion` := `/starknet/` + version
 
@@ -58,12 +56,12 @@ The request id, together with the sender id, should be enough for identifying th
 
 ## Protocols
 
-Different flows, namely block propagation, synchronization and transaction propagation, are specified below, on top of lower level network protocols (handshakes, pubsub, etc.). Each section below specifies the flow and the relevant messages passed between different agents.
+Different flows, namely block propagation, synchronization, and transaction propagation, are specified below, on top of lower-level network protocols (handshakes, pubsub, etc.). Each section below specifies the flow and the relevant messages passed between different agents.
 
 
 ### Common Types
 
-Common message types, relevant to several protocols are in [common.proto](./proto/common.proto).
+Common message types, relevant to several protocols, are in [common.proto](./proto/common.proto).
 
 Peer IDs should be displayed and accepted using content identifier (CID) encoding, described [here](https://github.com/libp2p/specs/blob/master/peer-ids/peer-ids.md#peer-ids).
 
@@ -73,21 +71,21 @@ Peer IDs should be displayed and accepted using content identifier (CID) encodin
 
 Discovery is the process of joining the network and discovering other relevant peer nodes that are part of the relevant chain.
 
-Simple protocol for discovery, based on pub sub implementation (similar to [pubsub-based discovery](https://github.com/libp2p/js-libp2p-pubsub-peer-discovery/)):
+A simple protocol for discovery, based on pub sub implementation (similar to [pubsub-based discovery](https://github.com/libp2p/js-libp2p-pubsub-peer-discovery/)):
 
 ![discovery](https://user-images.githubusercontent.com/77265175/189590881-e31ad7d0-be38-49d6-b284-29030853a452.png)
 
 1. A node connects to at least one node of the network
     - Using either [rendezvous protocol](https://github.com/libp2p/specs/tree/master/rendezvous#overview), or bootstrap nodes.
     - Rendezvous point: `_starknet_discover/` + configured chain id.
-    - The bootstrap nodes should allow connecting to the pubsub mechanism (either directly, or providing another nodes that does).
+    - The bootstrap nodes should allow connecting to the pubsub mechanism (either directly, or providing another node that does).
     -
 2. A node publishes a `NewNode` message to a predefined topic
     - The new node message should be signed and identifiable for the node publishing it (based on PeerID) - a node can only publish a `NewNode` message for itself.
     - Topic: `_starknet_nodes/` + configured chain id.
     - ==Can have subtopics for specific subnets, e.g. discover archive nodes==
 
-3. Subscribers receive the node, and continue to handshake if necessary.
+3. Subscribers receive the node and continue to handshake if necessary.
 4. A node re-publishes its known nodes (with ids) every predefined interval.
 
 
@@ -113,19 +111,19 @@ Some capabilities may be parameterized, the exact serialization of the capabilit
 
 #### Capabilities
 
-Capabilities are advertised by nodes, providing information on services these node execute in the network. This is similar in spirit to [discv5 topics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md#topic-table) or the [protocols advertised as part of the libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify#protocols).
+Capabilities are advertised by nodes, providing information on services these nodes execute in the network. This is similar in spirit to [discv5 topics](https://github.com/ethereum/devp2p/blob/master/discv5/discv5-theory.md#topic-table) or the [protocols advertised as part of the libp2p identify protocol](https://github.com/libp2p/specs/tree/master/identify#protocols).
 These can be used by nodes in their decision to connect (or remain connected) to other peers.
 
-For the sake of future compatibility and extensions, the Starknet protocol does not enumerate a mandatory list of capabilities. We do define here a scheme for encoding capabilities, and list some core capabilities likely to be used by protocols.
+For the sake of future compatibility and extensions, the Starknet protocol does not enumerate a mandatory list of capabilities. We do define here a scheme for encoding capabilities and list some core capabilities likely to be used by protocols.
 
 ##### String Encoding
 
 Capabilities are denoted by identifiers consisting of simple alphanumeric characters (`a-zA-Z0-9`) and underscore (`_`) and hyphen characters (`-`), in ASCII.
 
-Identifiers can be concatenated using the slashes (`/`), and followed by a version number. This allows for qualifications ("namespaces") and versioning of provided capabilities.
+Identifiers can be concatenated using slashes (`/`) and followed by a version number. This allows for qualifications ("namespaces") and versioning of provided capabilities.
 
-For example: the capability `core/state/1` provided by a node states that it provides the core state querying capability (its 1st version).
-The exact semantics of the capability and its version is to be documented as part of the definition of the capability. The capability usually translates into the protocols it supports and/or API it provides to peers.
+For example, the capability `core/state/1` provided by a node states that it provides the core state querying capability (its 1st version).
+The exact semantics of the capability and its version are to be documented as part of the definition of the capability. The capability usually translates into the protocols it supports and/or API it provides to peers.
 
 
 ##### Core Capabilities
@@ -134,7 +132,7 @@ We list here core capabilities that SHOULD be exposed by nodes in the network.
 
 
 
-| Capbility      | Description |
+| Capability      | Description |
 | -------------- | -------- |
 | `core/blocks-sync/1`     | The node provides information about past blocks and corresponding transactions     |
 | `core/state-sync/1` | The node provides state snapshot synchronization capability that can help with state synchronization |
@@ -148,14 +146,14 @@ We list here core capabilities that SHOULD be exposed by nodes in the network.
 
 The block propagation flow is the flow where nodes propagate information on newly created blocks.
 
-The block originator (the one publishing the block) publishes the necessary information to a well-known topic, with other nodes subsribed to that topic, and receiving the information.
+The block originator (the one publishing the block) publishes the necessary information to a well-known topic, with other nodes subscribed to that topic and receiving the information.
 The pubsub implementation will take care of publishing the information to available nodes.
 
 ![block_propagation](https://user-images.githubusercontent.com/77265175/189591198-f855f04d-57c4-4faa-87b2-6aa1c43868ee.png)
 
-Of course, in this case, invalid body or header will invalidate the block (and the node should mark it as problematic.).
+Of course, in this case, an invalid body or header will invalidate the block (and the node should mark it as problematic.).
 
-A node SHOULD disregard body and and state diffs for blocks with invalid headers.
+A node SHOULD disregard body and state diffs for blocks with invalid headers.
 
 The topic used to publish new blocks will be: `blocks/` + configured chain id.
 Where the configured chain id is the [starknet chain id](https://docs.starknet.io/documentation/architecture_and_concepts/Blocks/transactions/#chain-id) configured for the node.
@@ -168,7 +166,7 @@ The validation MUST include:
 1. Block number is as expected - consecutive to the parent block.
 2. The parent block hash matches the current known tip.
 3. Transactions and events in the body must match the commitment in the header.
-4. State diff, applied to current state, is consistent with the new state root.
+4. State diff, applied to the current state, is consistent with the new state root.
 
 Note that this assumes blocks received are blocks that are agreed by the consensus, or the node has some way to validate that the block received is agreed by the consensus mechanism.
 
@@ -182,7 +180,6 @@ Where contract class hash is defined [here](https://docs.starknet.io/documentati
 ----
 
 ### Synchronization
-
 A full node is expected to synchronize on the current state of the network.
 Full state synchronization includes the block headers and bodies (transaction and events) + the current available state at the highest block in the consensus.
 
@@ -288,8 +285,3 @@ A responding node may impose a lower limit on the returned transactions, i.e. re
 
 Transactions that are not in the pool, even if their hash was announced in `KnownPooledTransactions`, should not be returned.
 It is ok to return an empty list in `PooledTransactions` if none of the requested hashes is in the pool.
-
-
-
-
-
