@@ -23,6 +23,8 @@ message Vote {
     optional Hash      block_hash   = 6;
     // Identifies the voter.
     Address            voter        = 7;
+    // Signature by the voter.
+    ConsensusSignature signature    = 8;
 }
 
 message ProposalInit {
@@ -49,7 +51,7 @@ message ProposalFin {
 // `R` proposal P is locked. Then in a later round the timestamp in P has gone stale. Therefore the
 // lower bound should be "greater than the previous timestamp". Upper bounds don't suffer from this
 // problem.
-message Proposal {
+message ProposalPart {
     oneof messages {
         ProposalInit init         = 1;
         ProposalFin  fin          = 2;
@@ -60,13 +62,7 @@ message Proposal {
         Transactions transactions = 3;
         BlockProof   proof        = 4;
     }
+    // Signature by the proposer.
+    ConsensusSignature signature    = 5;
 }
 
-message ConsensusMessage {
-    oneof messages {
-        Vote     vote     = 1;
-        Proposal proposal = 2;
-    }
-    // Signature by the initial sender (e.g. proposer, voter) of the message.
-    ConsensusSignature signature    = 3;
-}
