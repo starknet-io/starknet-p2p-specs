@@ -1,9 +1,20 @@
 syntax = "proto3";
 
 import "p2p/proto/common.proto";
+import "p2p/proto/mempool/transaction.proto";
 import "p2p/proto/transaction.proto";
 
 // WIP - will change
+
+// Contains all variants of mempool and an L1Handler variant to cover all transactions that can be
+// in a new block.
+message ConsensusTransaction {
+    oneof txn {
+        MempoolTransaction transaction = 1;
+        L1HandlerV0 l1_handler = 2;
+    }
+    Hash transaction_hash = 3;
+}
 
 // Votes will be sent on the "consensus_votes" topic.
 message Vote {
@@ -56,8 +67,7 @@ message ProposalInit {
 }
 
 message TransactionBatch {
-    // TODO(guyn): replace Transaction with ConsensusTransaction
-    repeated Transaction transactions = 1;
+    repeated ConsensusTransaction transactions = 1;
 }
 
 // Finalize the Tendermint Proposal. When a validator receives this message it will presume that no
