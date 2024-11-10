@@ -65,7 +65,7 @@ should read bytes until it reaches EOF and thus it doesn't need to know the leng
 the message
 
 ### Limits
-- Each message must be less than 1MB, except for the [Class](./class.proto) message which is allowed
+- Each message must be less than 1MB, except for the [Class](../class.proto) message which is allowed
 to be up to 4MB.
 - TBD limits on the amount of total messages/bytes in a single session
 - TBD timeout for a session
@@ -101,7 +101,7 @@ For example. If the request has the values:
 Then the blocks we'll receive will be blocks no. 10, 7, 4
 
 ### Fin
-The [Fin](./common.proto) message is an empty message that signals the end of a protocol.
+The [Fin](../common.proto) message is an empty message that signals the end of a protocol.
 After sending all the data, the replying peer sends a Fin message.
 If a replying peer sends any additional messages after sending a fin message, they are considered
 malicious and the connection with them should be dropped.
@@ -157,7 +157,7 @@ The transactions protocol is used to download the transactions and receipts in a
 Its name for negotiation is `/starknet/transactions/0.1.0-rc.0`
 
 Each single message is either a fin, or a [TransactionWithReceipt](./transaction.proto)
-(A pair of [Transaction](./transaction.proto) and [Receipt](./receipt.proto))
+(A pair of [Transaction](../transaction.proto) and [Receipt](./receipt.proto))
 
 Each transaction represents a Starknet transaction. For more detail on the different transaction
 types, their content and their hash calculation see [here](https://docs.starknet.io/documentation/architecture_and_concepts/Network_Architecture/transactions/).
@@ -259,7 +259,7 @@ The classes protocol is used to download the classes declared in a range of bloc
 
 Its name for negotiation is `/starknet/classes/0.1.0-rc.0`
 
-Each single message is a fin or a [Class](./class.proto). For more information on classes, see
+Each single message is a fin or a [Class](../class.proto). For more information on classes, see
 [here](https://docs.starknet.io/documentation/architecture_and_concepts/Smart_Contracts/contract-classes/)
 
 You should use the [state diff protocol](#state-diff) before using this protocol.
