@@ -15,10 +15,58 @@ message AccountSignature {
     repeated Felt252 parts = 1;
 }
 
+message L1HandlerV0 {
+    Felt252 nonce = 1;
+    Address address = 2;
+    Felt252 entry_point_selector = 3;
+    repeated Felt252 calldata = 4;
+}
+
+message DeclareV3Common {
+    Address sender = 1;
+    AccountSignature signature = 2;
+    Felt252 nonce = 4;
+    Hash compiled_class_hash = 5;
+    ResourceBounds resource_bounds = 6;
+    uint64 tip = 7;
+    repeated Felt252 paymaster_data = 8;
+    repeated Felt252 account_deployment_data = 9;
+    VolitionDomain nonce_data_availability_mode = 10;
+    VolitionDomain fee_data_availability_mode = 11;
+}
+
+// see https://external.integration.starknet.io/feeder_gateway/get_transaction?transactionHash=0x41906f1c314cca5f43170ea75d3b1904196a10101190d2b12a41cc61cfd17c
+message InvokeV3 {
+    Address sender = 1;
+    AccountSignature signature = 2;
+    repeated Felt252 calldata = 3;
+    ResourceBounds resource_bounds = 4;
+    uint64 tip = 5;
+    repeated Felt252 paymaster_data = 6;
+    repeated Felt252 account_deployment_data = 7;
+    VolitionDomain nonce_data_availability_mode = 8;
+    VolitionDomain fee_data_availability_mode = 9;
+    Felt252 nonce = 10;
+}
+
+// see https://external.integration.starknet.io/feeder_gateway/get_transaction?transactionHash=0x29fd7881f14380842414cdfdd8d6c0b1f2174f8916edcfeb1ede1eb26ac3ef0
+message DeployAccountV3 {
+    AccountSignature signature = 1;
+    Hash class_hash = 2;
+    Felt252 nonce = 3;
+    Felt252 address_salt = 4;
+    repeated Felt252 calldata = 5;
+    ResourceBounds resource_bounds = 6;
+    uint64 tip = 7;
+    repeated Felt252 paymaster_data = 8;
+    VolitionDomain nonce_data_availability_mode = 9;
+    VolitionDomain fee_data_availability_mode = 10;
+}
+
+// TODO: move to p2p/proto/sync/transaction.proto
 // This is a transaction that is already accepted in a block. Once we have a mempool, we will define
 // a separate message for BroadcastedTransaction.
-message Transaction
-{
+message TransactionInBlock {
     message DeclareV0 {
         Address sender = 1;
         Felt252 max_fee = 2;
@@ -45,17 +93,8 @@ message Transaction
 
     // see https://external.integration.starknet.io/feeder_gateway/get_transaction?transactionHash=0x41d1f5206ef58a443e7d3d1ca073171ec25fa75313394318fc83a074a6631c3
     message DeclareV3 {
-        Address sender = 1;
-        AccountSignature signature = 2;
-        Hash class_hash = 3;
-        Felt252 nonce = 4;
-        Hash compiled_class_hash = 5;
-        ResourceBounds resource_bounds = 6;
-        uint64 tip = 7;
-        repeated Felt252 paymaster_data = 8;
-        repeated Felt252 account_deployment_data = 9;
-        VolitionDomain nonce_data_availability_mode = 10;
-        VolitionDomain fee_data_availability_mode = 11;
+        DeclareV3Common common = 1;
+        Hash class_hash = 2;
     }
 
     message Deploy {
@@ -74,20 +113,6 @@ message Transaction
         repeated Felt252 calldata = 6;
     }
 
-    // see https://external.integration.starknet.io/feeder_gateway/get_transaction?transactionHash=0x29fd7881f14380842414cdfdd8d6c0b1f2174f8916edcfeb1ede1eb26ac3ef0
-    message DeployAccountV3 {
-        AccountSignature signature = 1;
-        Hash class_hash = 2;
-        Felt252 nonce = 3;
-        Felt252 address_salt = 4;
-        repeated Felt252 calldata = 5;
-        ResourceBounds resource_bounds = 6;
-        uint64 tip = 7;
-        repeated Felt252 paymaster_data = 8;
-        VolitionDomain nonce_data_availability_mode = 9;
-        VolitionDomain fee_data_availability_mode = 10;
-    }
-
     message InvokeV0 {
         Felt252 max_fee = 1;
         AccountSignature signature = 2;
@@ -102,27 +127,6 @@ message Transaction
         AccountSignature signature = 3;
         repeated Felt252 calldata = 4;
         Felt252 nonce = 5;
-    }
-
-    // see https://external.integration.starknet.io/feeder_gateway/get_transaction?transactionHash=0x41906f1c314cca5f43170ea75d3b1904196a10101190d2b12a41cc61cfd17c
-    message InvokeV3 {
-        Address sender = 1;
-        AccountSignature signature = 2;
-        repeated Felt252 calldata = 3;
-        ResourceBounds resource_bounds = 4;
-        uint64 tip = 5;
-        repeated Felt252 paymaster_data = 6;
-        repeated Felt252 account_deployment_data = 7;
-        VolitionDomain nonce_data_availability_mode = 8;
-        VolitionDomain fee_data_availability_mode = 9;
-        Felt252 nonce = 10;
-    }
-
-    message L1HandlerV0 {
-        Felt252 nonce = 1;
-        Address address = 2;
-        Felt252 entry_point_selector = 3;
-        repeated Felt252 calldata = 4;
     }
 
     oneof txn {

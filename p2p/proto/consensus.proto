@@ -1,12 +1,30 @@
 syntax = "proto3";
 
+import "p2p/proto/class.proto";
 import "p2p/proto/common.proto";
 import "p2p/proto/transaction.proto";
 
 // WIP - will change
 
+// like MempoolTransaction, except it has a L1Handler variant.
+message ConsensusTransaction {
+    message DeclareV3 {
+        DeclareV3Common common = 1;
+        Cairo1Class class = 2;
+    }
+
+    oneof txn {
+        DeclareV3 declare_v3 = 1;
+        DeployAccountV3 deploy_account_v3 = 2;
+        InvokeV3 invoke_v3 = 3;
+        L1HandlerV0 l1_handler = 4;
+    }
+    Hash transaction_hash = 5;
+}
+
 message Transactions {
-    repeated Transaction transactions = 1;
+    // TODO: use ConsensusTransaction instead.
+    repeated TransactionInBlock transactions = 1;
 }
 
 message Vote {
