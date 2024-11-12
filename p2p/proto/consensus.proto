@@ -29,6 +29,7 @@ message ProposalInit {
     uint64  block_number   = 2;
     uint64  fork_id        = 3;
     uint32  proposal_round = 4;
+    optional uint32 valid_round = 5;
 }
 
 // Finalize the Tendermint Proposal. When a validator receives this message it will presume that no
@@ -56,7 +57,7 @@ message Proposal {
         // Once block `H` is decided there remains a question; which set of validators receive a
         // reward? More specifically, what is the canonical set of precommits for block `H`? Our
         // current plan is for the proposer to set the first transaction in `H+1` to be writing the
-        // list of precommits for `H` to the staking contract in startknet.
+        // list of precommits for `H` to the staking contract in starknet.
         Transactions transactions = 3;
         BlockProof   proof        = 4;
     }
@@ -67,6 +68,6 @@ message ConsensusMessage {
         Vote     vote     = 1;
         Proposal proposal = 2;
     }
-    // Signature by the initial sender (e.g. proposer, voter) of the message.
+    // Signature by the initial sender (e.g., proposer, voter) of the message.
     ConsensusSignature signature    = 3;
 }

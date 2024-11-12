@@ -79,5 +79,4 @@ message Iteration {
 }
 
 // mark the end of a stream of messages
-// TBD: may not be required if we open a stream per request.
 message Fin {}
