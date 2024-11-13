@@ -26,10 +26,7 @@ message Vote {
 }
 
 message ConsensusMessage {
-    oneof messages {
-        Vote     vote     = 1;
-        Proposal proposal = 2;
-    }
+    Vote     vote     = 1;
     // Signature by the initial sender (e.g., proposer, voter) of the message.
     ConsensusSignature signature    = 3;
 }
@@ -47,19 +44,9 @@ message ProposalPart {
         // reward? More specifically, what is the canonical set of precommits for block `H`? Our
         // current plan is for the proposer to set the first transaction in `H+1` to be writing the
         // list of precommits for `H` to the staking contract in starknet.
-        Transactions transactions = 3;
+        TransactionBatch transactions = 3;
     }
 }
-
-// Finalize the Tendermint Proposal. When a validator receives this message it will presume that no
-// more content for the proposal should be sent. The signature supplied with ProposalFin should be
-// for the full Tendermint proposal:
-// 1. height
-// 2. fork_id
-// 3. proposal_round
-// 4. valid_round
-// 5. block_hash - the validator calculates the block_hash on its own from the content stream and
-//    confirms the signature with that value.
 
 message ProposalInit {
     uint64 height = 1;
@@ -72,16 +59,28 @@ message TransactionBatch {
     repeated Transaction transactions = 1;
 }
 
+// Finalize the Tendermint Proposal. When a validator receives this message it will presume that no
+// more content for the proposal should be sent. The signature supplied with ProposalFin should be
+// for the full Tendermint proposal:
+// 1. height
+// 2. fork_id
+// 3. proposal_round
+// 4. valid_round
+// 5. block_hash - the validator calculates the block_hash on its own from the content stream and
+//    confirms the signature with that value.
 message ProposalFin {
     // Identifies all of the content streamed in the proposal.
     Hash proposal_content_id = 1;
 }
 
+// The content and stream_id are generic fields. The user of the stream can choose to pass whatever they want 
+// in either one of those fields, so long as the data is convertible to bytes. 
+// For Consensus, we use a content which is a ProposalPart, and a stream_id that is a (height, round) tuple. 
 message StreamMessage {
     oneof message {
         bytes content = 1;
         Fin fin = 2;
     }
-    uint64 stream_id = 3;
+    bytes stream_id = 3;
     uint64 message_id = 4;
 }
