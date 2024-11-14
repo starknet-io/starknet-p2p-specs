@@ -25,10 +25,9 @@ message Vote {
     Address            voter        = 7;
 }
 
-message ConsensusMessage {
-    Vote     vote     = 1;
-    // Signature by the initial sender (e.g., proposer, voter) of the message.
-    ConsensusSignature signature    = 3;
+message ConsensusStreamId {
+    uint64 height = 0;
+    uint32 round  = 1; 
 }
 
 // The timestamp of a proposal can impact consensus, specifically the lower bound applied. If nodes
@@ -71,11 +70,12 @@ message TransactionBatch {
 //    confirms the signature with that value.
 message ProposalFin {
     // Identifies all of the content streamed in the proposal.
-    Hash proposal_content_id = 1;
+    Hash block_hash = 1;
 }
 
-// The content and stream_id are generic fields. The user of the stream can choose to pass whatever they want 
-// in either one of those fields, so long as the data is convertible to bytes. 
+// The content and stream_id are generic fields. The user of the stream can choose to pass whatever message 
+// and whatever stream_id format that they want. The messages are then encoded in bytes.  
+// The stream_id must be hashable. In the case of Consensus, the stream_id will be of type ConsensusStreamId (height, round). 
 // For Consensus, we use a content which is a ProposalPart, and a stream_id that is a (height, round) tuple. 
 message StreamMessage {
     oneof message {
