@@ -34,24 +34,24 @@ message and the other peer responds with multiple response messages
 
 The request is always a range of blocks and the responses are data related to those blocks.
 
-This allows the querying peer to process data (e.g calculate hashes) before it downloaded all the
+This allows the querying peer to process data (e.g., calculate hashes) before it downloaded all the
 data that the replying peer sent in the session.
 
 The data sent is always a `oneof` of messages containing data and a [Fin](#fin).
 
 ### Partitioning data into blocks
-Except for the [headers](#headers) protocol, The partition of data into blocks does not appear in
+Except for the [headers](#headers) protocol, the partition of data into blocks does not appear in
 the data itself.
 
 This partition can be done based on the data in the header.
 
 For each protocol, in the header, there's a commitment on the data given by this protocol.
-The commitment is made of hash and number of elements
+The commitment is made of a hash and the number of elements
 
 The commitment is included inside the block hash. Meaning that it can be validated once we
 downloaded the header.
 
-The length field can be used to determine in each protocol when does the data of one block stops and
+The length field can be used to determine in each protocol when does the data of one block stop and
 the data of the next block after it begins.
 
 ### Length Prefix
@@ -123,7 +123,7 @@ The fields that are not in the block hash of blocks before v0.13.2 are:
 * Receipt commitment
 * L1 data availability mode
 * Gas and data gas prices
-* In event commitment, the emmiting transaction
+* In event commitment, the emitting transaction
 
 This means that a peer cannot download those blocks from an untrusted peer, because
 the replying peer can change the value of those fields and the signed block hash won't change.
@@ -234,7 +234,7 @@ A DeclaredClass represents a declared class. If the class is Cairo1 then the `co
 field will be present
 
 There's no guarantee on what ordering will the messages have for a single block's state diff.
-The only constraint is that each `ContractDiff` can't be empty, i.e one of the following fields have
+The only constraint is that each `ContractDiff` can't be empty, i.e., one of the following fields have
 value:
 * `nonce`
 * `class_hash`
