@@ -28,8 +28,8 @@ message Vote {
 
 // Streaming of proposals is done on the "consensus_proposal" topic.
 message ConsensusStreamId {
-    uint64 height = 0;
-    uint32 round  = 1; 
+    uint64 height = 1;
+    uint32 round  = 2;
 }
 
 // The timestamp of a proposal can impact consensus, specifically the lower bound applied. If nodes
