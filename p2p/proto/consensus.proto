@@ -6,6 +6,7 @@ import "p2p/proto/transaction.proto";
 
 // WIP - will change
 
+// Votes will be sent on the "consensus_votes" topic.
 message Vote {
     enum  VoteType {
         Prevote   = 0;
@@ -25,10 +26,39 @@ message Vote {
     Address            voter        = 7;
 }
 
+// Streaming of proposals is done on the "consensus_proposal" topic.
+message ConsensusStreamId {
+    uint64 height = 0;
+    uint32 round  = 1; 
+}
+
+// The timestamp of a proposal can impact consensus, specifically the lower bound applied. If nodes
+// apply a lower bound validation based on their local time, then we risk a scenario where in round
+// `R` proposal P is locked. Then in a later round the timestamp in P has gone stale. Therefore the
+// lower bound should be "greater than the previous timestamp". Upper bounds don't suffer from this
+// problem.
+message ProposalPart {
+    oneof messages {
+        ProposalInit init         = 1;
+        ProposalFin  fin          = 2;
+        // Once block `H` is decided there remains a question; which set of validators receive a
+        // reward? More specifically, what is the canonical set of precommits for block `H`? Our
+        // current plan is for the proposer to set the first transaction in `H+1` to be writing the
+        // list of precommits for `H` to the staking contract in starknet.
+        TransactionBatch transactions = 3;
+    }
+}
+
 message ProposalInit {
-    uint64  block_number   = 2;
-    uint64  fork_id        = 3;
-    uint32  proposal_round = 4;
+    uint64 height = 1;
+    uint32 round = 2;
+    optional uint32 valid_round = 3;
+    Address proposer = 4;
+}
+
+message TransactionBatch {
+    // TODO(guyn): replace Transaction with ConsensusTransaction
+    repeated Transaction transactions = 1;
 }
 
 // Finalize the Tendermint Proposal. When a validator receives this message it will presume that no
@@ -41,32 +71,20 @@ message ProposalInit {
 // 5. block_hash - the validator calculates the block_hash on its own from the content stream and
 //    confirms the signature with that value.
 message ProposalFin {
-    optional uint32 valid_round    = 1;
+    // Identifies all of the content streamed in the proposal.
+    // Note that the set of block identifiers being hashed is subject to change,
+    // which will be reflected in a change of the name of this field.
+    Hash state_diff_commitment = 1;
 }
 
-// The timestamp of a proposal can impact consensus, specifically the lower bound applied. If nodes
-// apply a lower bound validation based on their local time, then we risk a scenario where in round
-// `R` proposal P is locked. Then in a later round the timestamp in P has gone stale. Therefore the
-// lower bound should be "greater than the previous timestamp". Upper bounds don't suffer from this
-// problem.
-message Proposal {
-    oneof messages {
-        ProposalInit init         = 1;
-        ProposalFin  fin          = 2;
-        // Once block `H` is decided there remains a question; which set of validators receive a
-        // reward? More specifically, what is the canonical set of precommits for block `H`? Our
-        // current plan is for the proposer to set the first transaction in `H+1` to be writing the
-        // list of precommits for `H` to the staking contract in startknet.
-        Transactions transactions = 3;
-        BlockProof   proof        = 4;
+// The content and stream_id are generic fields. The user of the stream can choose to pass whatever message
+// that they want. The messages are then encoded in bytes.
+// For Consensus, we use a content which is a ProposalPart, and a stream_id that is a ConsensusStreamId.
+message StreamMessage {
+    oneof message {
+        bytes content = 1;
+        Fin fin = 2;
     }
-}
-
-message ConsensusMessage {
-    oneof messages {
-        Vote     vote     = 1;
-        Proposal proposal = 2;
-    }
-    // Signature by the initial sender (e.g. proposer, voter) of the message.
-    ConsensusSignature signature    = 3;
+    bytes stream_id = 3;
+    uint64 message_id = 4;
 }
