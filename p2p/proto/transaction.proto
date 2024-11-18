@@ -1,6 +1,5 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
-import "p2p/proto/receipt.proto";
 
 message ResourceLimits {
     Felt252 max_amount = 1;
@@ -140,28 +139,4 @@ message Transaction
         L1HandlerV0 l1_handler = 11;
     }
     Hash transaction_hash = 12;
-}
-
-message TransactionWithReceipt {
-    Transaction transaction = 1;
-    Receipt receipt = 2;
-}
-
-// TBD: can support a flag to return tx hashes only, good for standalone mempool to remove them,
-// or any node that keeps track of transaction streaming in the consensus.
-message TransactionsRequest {
-    Iteration iteration = 1;
-}
-
-// Responses are sent ordered by the order given in the request. The order inside each block is
-// according to the execution order.
-message TransactionsResponse {
-    oneof transaction_message {
-        TransactionWithReceipt transaction_with_receipt = 1;
-        Fin fin = 2; // Fin is sent after the peer sent all the data or when it encountered a block that it doesn't have its transactions.
-    }
-}
-
-message Transactions {
-    repeated Transaction transactions = 1;
 }

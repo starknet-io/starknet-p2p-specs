@@ -1,7 +1,6 @@
 syntax = "proto3";
 
 import "p2p/proto/common.proto";
-import "p2p/proto/header.proto";
 import "p2p/proto/transaction.proto";
 
 // WIP - will change
