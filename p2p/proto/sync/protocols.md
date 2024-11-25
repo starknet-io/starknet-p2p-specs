@@ -157,10 +157,16 @@ The transactions protocol is used to download the transactions and receipts in a
 Its name for negotiation is `/starknet/transactions/0.1.0-rc.0`
 
 Each single message is either a fin, or a [TransactionWithReceipt](./transaction.proto)
-(A pair of [Transaction](../transaction.proto) and [Receipt](./receipt.proto))
+(A pair of [TransactionInBlock](./transaction.proto) and [Receipt](./receipt.proto))
 
-Each transaction represents a Starknet transaction. For more detail on the different transaction
-types, their content and their hash calculation see [here](https://docs.starknet.io/documentation/architecture_and_concepts/Network_Architecture/transactions/).
+Each transaction represents a Starknet transaction that's already part of the Starknet chain.
+For more detail on the different transaction types, their content and their hash calculation see [here](https://docs.starknet.io/documentation/architecture_and_concepts/Network_Architecture/transactions/).
+
+The main differences between [TransactionInBlock](./transaction.proto) and a transaction that is pending insertion ([ConsensusTransaction](../consensus/consensus.proto) or [MempoolTransaction](../mempool/transaction.proto))
+are:
+* TransactionInBlock supports old transaction versions, including the deprecated deploy transaction.
+* TransactionInBlock's declare doesn't contain the sierra class. It just contains the class hash.
+
 
 A receipt is comprised of
 * The hash of the transaction this receipt belongs to
