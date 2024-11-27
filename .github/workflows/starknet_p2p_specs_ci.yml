@@ -1,0 +1,54 @@
+name: Starknet-P2p-Specs-CI
+
+on:
+  pull_request:
+    branches:
+      - main
+      - 'v*.*'
+      - 'v*.*.*'
+      - 'alonl/ci_test'
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - auto_merge_enabled
+    paths:
+      - '.github/workflows/starknet_p2p_sepcs_ci.yaml'
+      - '**.proto'
+    
+  merge_group:
+    types: [checks_requested]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  PROTOC_VERSION: v25.1
+
+jobs:
+  compile-protos:
+    runs-on: starkware-ubuntu-latest-medium
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install protobuf compiler (protoc)
+        run: |
+          sudo apt-get update
+          sudo apt-det install -y protobuf-compiler
+
+      - name: Validate .proto files for Rust compatibility
+        run: protoc --rust_out=/dev/null **.proto
+      
+      - name: Validate .proto files for Java compatibility
+        run: protoc --java_out=/dev/null **.proto
+
+      - name: Validate .proto files for python compatibility
+        run: protoc --python_out=/dev/null **.proto
+
+      - name: Validate .proto files for C++ compatibility
+        run: protoc --cpp_out=/dev/null **.proto
+
+      - name: Success Message
+        run: echo "All proto compilations passed!"
