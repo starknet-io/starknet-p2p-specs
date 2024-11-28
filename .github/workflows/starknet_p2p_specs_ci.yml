@@ -3,7 +3,7 @@ name: Starknet-P2p-Specs-CI
 on:
   pull_request:
     branches:
-      - main
+      - 'main'
       - 'v*.*'
       - 'v*.*.*'
       - 'alonl/ci_test'
