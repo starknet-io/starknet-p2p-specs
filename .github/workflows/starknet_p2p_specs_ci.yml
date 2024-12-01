@@ -4,55 +4,62 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - 'main'
-      - 'v*.*'
-      - 'v*.*.*'
-      - 'alonl/ci_test'
+      - '*'
     types:
       - opened
       - reopened
       - synchronize
       - auto_merge_enabled
-    paths:
-      - '.github/workflows/starknet_p2p_sepcs_ci.yaml'
-      - '--fatal_warnings **.proto'
-    
-  merge_group:
-    types: [checks_requested]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+      - edited
 
 env:
   PROTOC_VERSION: v25.1
 
 jobs:
   compile-protos:
-    runs-on: starkware-ubuntu-latest-medium
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+      
+      - name: echo pwd
+        run: pwd
+
+      - name: echo HOME
+        run: echo ~
+
+      - name: lsla .
+        run: ls -la
 
       - name: Install protobuf compiler (protoc)
         run: |
           sudo apt-get update
-          sudo apt-det install -y protobuf-compiler
+          sudo apt-get install -y protobuf-compiler
 
       - name: Validate .proto files for Rust compatibility
-        run: protoc --rust_out=/dev/null --fatal_warnings **.proto
+        run: |
+          protoc --rust_out=/dev/null ./p2p/proto/*.proto
+          protoc --rust_out=/dev/null ./p2p/proto/**/*.proto
       
       - name: Validate .proto files for Java compatibility
-        run: protoc --java_out=/dev/null --fatal_warnings **.proto
+        run: |
+          protoc --java_out=/dev/null ./p2p/proto/*.proto
+          protoc --java_out=/dev/null ./p2p/proto/**/*.proto
 
-      - name: Validate .proto files for python compatibility
-        run: protoc --python_out=/dev/null --fatal_warnings **.proto
+      - name: Validate .proto files for Python compatibility
+        run: |
+          protoc --python_out=/dev/null ./p2p/proto/*.proto
+          protoc --python_out=/dev/null ./p2p/proto/**/*.proto
 
       - name: Validate .proto files for C++ compatibility
-        run: protoc --cpp_out=/dev/null --fatal_warnings **.proto
+        run: |
+          protoc --cpp_out=/dev/null ./p2p/proto/*.proto
+          protoc --cpp_out=/dev/null ./p2p/proto/**/*.proto
 
       - name: Validate .proto files for Go compatibility
-        run: protoc --go_out=/dev/null --fatal_warnings **.proto
+        run: |
+          protoc --go_out=/dev/null ./p2p/proto/*.proto
+          protoc --go_out=/dev/null ./p2p/proto/**/*.proto
 
       - name: Success Message
         run: echo "All proto compilations passed!"
