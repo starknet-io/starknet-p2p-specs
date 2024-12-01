@@ -1,6 +1,7 @@
 name: Starknet-P2p-Specs-CI
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
       - 'main'
@@ -14,7 +15,7 @@ on:
       - auto_merge_enabled
     paths:
       - '.github/workflows/starknet_p2p_sepcs_ci.yaml'
-      - '**.proto'
+      - '--fatal_warnings **.proto'
     
   merge_group:
     types: [checks_requested]
@@ -39,16 +40,19 @@ jobs:
           sudo apt-det install -y protobuf-compiler
 
       - name: Validate .proto files for Rust compatibility
-        run: protoc --rust_out=/dev/null **.proto
+        run: protoc --rust_out=/dev/null --fatal_warnings **.proto
       
       - name: Validate .proto files for Java compatibility
-        run: protoc --java_out=/dev/null **.proto
+        run: protoc --java_out=/dev/null --fatal_warnings **.proto
 
       - name: Validate .proto files for python compatibility
-        run: protoc --python_out=/dev/null **.proto
+        run: protoc --python_out=/dev/null --fatal_warnings **.proto
 
       - name: Validate .proto files for C++ compatibility
-        run: protoc --cpp_out=/dev/null **.proto
+        run: protoc --cpp_out=/dev/null --fatal_warnings **.proto
+
+      - name: Validate .proto files for Go compatibility
+        run: protoc --go_out=/dev/null --fatal_warnings **.proto
 
       - name: Success Message
         run: echo "All proto compilations passed!"
