@@ -1,5 +1,4 @@
 syntax = "proto3";
-import "p2p/proto/common.proto";
 
 // A capability for one of the following protocols:
 // 1. /starknet/headers/
