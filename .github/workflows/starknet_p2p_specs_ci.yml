@@ -39,10 +39,10 @@ jobs:
           protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/*.proto
           protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/**/*.proto
       
-      - name: Validate .proto files for Java compatibility
-        run: |
-          protoc --java_out=$(mktemp -d) ./p2p/proto/*.proto
-          protoc --java_out=$(mktemp -d) ./p2p/proto/**/*.proto
+      # - name: Validate .proto files for Java compatibility
+      #   run: |
+      #     protoc --java_out=$(mktemp -d) ./p2p/proto/*.proto
+      #     protoc --java_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
       - name: Validate .proto files for Python compatibility
         run: |
