@@ -1,54 +1,73 @@
 name: Starknet-P2p-Specs-CI
 
 on:
+  workflow_dispatch:
   pull_request:
     branches:
-      - main
-      - 'v*.*'
-      - 'v*.*.*'
-      - 'alonl/ci_test'
+      - '*'
     types:
       - opened
       - reopened
       - synchronize
       - auto_merge_enabled
-    paths:
-      - '.github/workflows/starknet_p2p_sepcs_ci.yaml'
-      - '**.proto'
-    
-  merge_group:
-    types: [checks_requested]
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}-${{ github.job }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+      - edited
 
 env:
   PROTOC_VERSION: v25.1
 
 jobs:
   compile-protos:
-    runs-on: starkware-ubuntu-latest-medium
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        
+      - uses: Noelware/setup-protoc@1.1.0
+        with:
+          version: ${{env.PROTOC_VERSION}}
 
-      - name: Install protobuf compiler (protoc)
+      - name: Find .proto files
+        id: find-protos
         run: |
-          sudo apt-get update
-          sudo apt-det install -y protobuf-compiler
+          proto_files=$(find . -name "*.proto")
+          if [ -z "$proto_files" ]; then
+            echo "No .proto files found."
+            exit 1
+          fi
+          echo "Found the following .proto files:"
+          echo "$proto_files"
+          # Save the list as an output
+          echo "proto_files=$(echo "$proto_files" | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
-      - name: Validate .proto files for Rust compatibility
-        run: protoc --rust_out=/dev/null **.proto
-      
-      - name: Validate .proto files for Java compatibility
-        run: protoc --java_out=/dev/null **.proto
+      - name: Validate Rust compatibility
+        run: |
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) $file
+          done
 
-      - name: Validate .proto files for python compatibility
-        run: protoc --python_out=/dev/null **.proto
+      - name: Validate Python compatibility
+        run: |
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --python_out=$(mktemp -d) $file
+          done
 
-      - name: Validate .proto files for C++ compatibility
-        run: protoc --cpp_out=/dev/null **.proto
+      - name: Validate C++ compatibility
+        run: |
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --cpp_out=$(mktemp -d) $file
+          done
+
+      - name: Validate GO compatibility
+        run: |
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+          export PATH=$PATH:$(go env GOPATH)/bin
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative $file
+          done
 
       - name: Success Message
         run: echo "All proto compilations passed!"

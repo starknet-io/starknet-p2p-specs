@@ -1,6 +1,8 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/sync/receipt";
+
 message MessageToL1 {
   Felt252 from_address = 2;
   repeated Felt252 payload = 3;

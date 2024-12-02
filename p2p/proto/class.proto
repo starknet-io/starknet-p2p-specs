@@ -1,6 +1,7 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/class";
 
 message EntryPoint {
     Felt252 selector = 1;
