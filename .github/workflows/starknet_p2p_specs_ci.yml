@@ -26,6 +26,30 @@ jobs:
         with:
           version: ${{env.PROTOC_VERSION}}
 
+
+      - name: Find .proto files
+        id: find-protos
+        run: |
+          proto_files=$(find . -name "*.proto")
+          if [ -z "$proto_files" ]; then
+            echo "No .proto files found."
+            exit 1
+          fi
+          echo "Found the following .proto files:"
+          echo "$proto_files"
+          # Save the list as an output
+          echo "proto_files=$(echo "$proto_files" | tr '\n' ' ')" >> $GITHUB_OUTPUT
+
+      - name: Validate rust
+        run: |
+          echo "Using the following .proto files from previous step:"
+          echo "${{ steps.find-protos.outputs.proto_files }}"
+          protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ${{ steps.find-protos.outputs.proto_files }}
+        # for file in ${{ steps.find-protos.outputs.proto_files }}; do
+        #   echo "Processing $file"
+        #   protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) file
+        # done
+
       # - name: Validate .proto files for Rust compatibility
       #   run: |
       #     protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) *.proto
