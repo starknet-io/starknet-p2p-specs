@@ -36,28 +36,28 @@ jobs:
 
       - name: Validate .proto files for Rust compatibility
         run: |
-          protoc --rust_out=experimental-codegen=enabled,kernel=upb:/dev/null ./p2p/proto/*.proto
-          protoc --rust_out=experimental-codegen=enabled,kernel=upb:/dev/null ./p2p/proto/**/*.proto
+          protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/*.proto
+          protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/**/*.proto
       
       - name: Validate .proto files for Java compatibility
         run: |
-          protoc --java_out=/dev/null ./p2p/proto/*.proto
-          protoc --java_out=/dev/null ./p2p/proto/**/*.proto
+          protoc --java_out=$(mktemp -d) ./p2p/proto/*.proto
+          protoc --java_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
       - name: Validate .proto files for Python compatibility
         run: |
-          protoc --python_out=/dev/null ./p2p/proto/*.proto
-          protoc --python_out=/dev/null ./p2p/proto/**/*.proto
+          protoc --python_out=$(mktemp -d) ./p2p/proto/*.proto
+          protoc --python_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
       - name: Validate .proto files for C++ compatibility
         run: |
-          protoc --cpp_out=/dev/null ./p2p/proto/*.proto
-          protoc --cpp_out=/dev/null ./p2p/proto/**/*.proto
+          protoc --cpp_out=$(mktemp -d) ./p2p/proto/*.proto
+          protoc --cpp_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
       - name: Validate .proto files for Go compatibility
         run: |
-          protoc --go_out=/dev/null ./p2p/proto/*.proto
-          protoc --go_out=/dev/null ./p2p/proto/**/*.proto
+          protoc --go_out=$(mktemp -d) ./p2p/proto/*.proto
+          protoc --go_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
       - name: Success Message
         run: echo "All proto compilations passed!"
