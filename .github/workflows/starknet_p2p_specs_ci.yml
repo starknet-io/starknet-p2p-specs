@@ -43,21 +43,21 @@ jobs:
         run: |
           for file in ${{ steps.find-protos.outputs.proto_files }}; do
             echo "Compiling $file"
-            protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) $file
+            protoc --fatal_warnings --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) $file
           done
 
       - name: Validate Python compatibility
         run: |
           for file in ${{ steps.find-protos.outputs.proto_files }}; do
             echo "Compiling $file"
-            protoc --python_out=$(mktemp -d) $file
+            protoc --fatal_warnings --python_out=$(mktemp -d) $file
           done
 
       - name: Validate C++ compatibility
         run: |
           for file in ${{ steps.find-protos.outputs.proto_files }}; do
             echo "Compiling $file"
-            protoc --cpp_out=$(mktemp -d) $file
+            protoc --fatal_warnings --cpp_out=$(mktemp -d) $file
           done
 
       - name: Validate GO compatibility
@@ -66,7 +66,7 @@ jobs:
           export PATH=$PATH:$(go env GOPATH)/bin
           for file in ${{ steps.find-protos.outputs.proto_files }}; do
             echo "Compiling $file"
-            protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative $file
+            protoc --fatal_warnings --go_out=$(mktemp -d) --go_opt=paths=source_relative $file
           done
 
       - name: Success Message
