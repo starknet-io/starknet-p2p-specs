@@ -36,8 +36,8 @@ jobs:
 
       - name: Validate .proto files for Rust compatibility
         run: |
-          protoc --rust_out=experimental-codegen=enabled:/dev/null ./p2p/proto/*.proto
-          protoc --rust_out=experimental-codegen=enabled:/dev/null ./p2p/proto/**/*.proto
+          protoc --rust_out=experimental-codegen=enabled,kernel=upb:/dev/null ./p2p/proto/*.proto
+          protoc --rust_out=experimental-codegen=enabled,kernel=upb:/dev/null ./p2p/proto/**/*.proto
       
       - name: Validate .proto files for Java compatibility
         run: |
