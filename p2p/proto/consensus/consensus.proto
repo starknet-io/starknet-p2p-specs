@@ -3,6 +3,8 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 import "p2p/proto/transaction.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/consensus/consensus";
+
 // WIP - will change
 
 // Contains all variants of mempool and an L1Handler variant to cover all transactions that can be

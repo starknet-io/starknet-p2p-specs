@@ -3,6 +3,8 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 import "p2p/proto/transaction.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/mempool/transaction";
+
 // Doesn't contain L1Handler, as those don't need to be propagated and can be downloaded from L1.
 message MempoolTransaction {
     oneof txn {

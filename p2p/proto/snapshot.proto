@@ -4,6 +4,8 @@ import "p2p/proto/common.proto";
 import "p2p/proto/state.proto";
 import "p2p/proto/class.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/snapshot";
+
 message PatriciaNode {
     message Edge {
         uint32 length = 1;

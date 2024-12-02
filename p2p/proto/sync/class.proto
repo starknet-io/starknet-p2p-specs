@@ -3,6 +3,8 @@ import "p2p/proto/class.proto";
 import "p2p/proto/common.proto";
 import "p2p/proto/sync/common.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/sync/class";
+
 message ClassesRequest {
     Iteration iteration = 1;
 }
