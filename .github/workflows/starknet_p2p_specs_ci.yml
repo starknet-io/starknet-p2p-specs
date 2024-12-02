@@ -47,8 +47,6 @@ jobs:
             protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) $file
           done
 
-        # protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ${{ steps.find-protos.outputs.proto_files }}
-
       - name: Validate Python compatibility
         run: |
           for file in ${{ steps.find-protos.outputs.proto_files }}; do
@@ -62,9 +60,6 @@ jobs:
             echo "Compiling $file"
             protoc --cpp_out=$(mktemp -d) $file
           done
-        # protoc --cpp_out=$(mktemp -d) *.proto
-        # protoc --cpp_out=$(mktemp -d) ./p2p/proto/*.proto
-        # protoc --cpp_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
       - name: Validate GO compatibility
         run: |
@@ -75,29 +70,5 @@ jobs:
             protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative $file
           done
           
-        # protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative *.proto
-        # protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative ./p2p/proto/*.proto
-        # protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative ./p2p/proto/**/*.proto
-      
-      # - name: go env GOPATH
-      #   run: go env GOPATH
-
-      # - name: export GOPATH
-      #   run: export PATH=$PATH:$(go env GOPATH)/bin
-
-      # - name: echo PATH
-      #   run: echo $PATH
-
-      # - name: check protoc-gen-go installation dir
-      #   run: ls $(go env GOPATH)/bin/protoc-gen-go
-
-      # - name: which protoc-gen-go
-      #   run: which protoc-gen-go
-
-      # - name: Validate .proto files for Go compatibility
-      #   run: |
-      #     protoc --go_out=$(mktemp -d) ./p2p/proto/*.proto
-      #     protoc --go_out=$(mktemp -d) ./p2p/proto/**/*.proto
-
       - name: Success Message
         run: echo "All proto compilations passed!"
