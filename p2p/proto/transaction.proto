@@ -1,5 +1,6 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
+import "p2p/proto/class.proto";
 
 message ResourceLimits {
     Felt252 max_amount = 1;
