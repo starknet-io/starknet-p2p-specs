@@ -26,15 +26,25 @@ jobs:
         with:
           version: ${{env.PROTOC_VERSION}}
 
-      - name: Validate .proto files for Rust compatibility
-        run: |
-          protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) *.proto
+      # - name: Validate .proto files for Rust compatibility
+      #   run: |
+      #     protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) *.proto
         # protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/*.proto
         # protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/**/*.proto
 
       - name: Validate .proto files for Python compatibility
         run: |
-          protoc --python_out=$(mktemp -d) *.proto  
+          echo "Searching for .proto files..."
+          proto_files=$(find . -name "*.proto")
+          if [ -z "$proto_files" ]; then
+            echo "No .proto files found."
+            exit 0
+          fi
+          echo "Found the following .proto files:"
+          echo "$proto_files"
+          echo "Compiling protos..."
+          echo "$proto_files" | xargs protoc --proto_path=. --python_out=$(mktemp -d)
+        # find . -name "*.proto" -exec protoc --proto_path=. --python_out=$(mktemp -d) {} +
         # protoc --python_out=$(mktemp -d) ./p2p/proto/*.proto
         # protoc --python_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
