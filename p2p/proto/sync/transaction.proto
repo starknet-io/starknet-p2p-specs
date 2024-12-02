@@ -4,8 +4,6 @@ import "p2p/proto/sync/common.proto";
 import "p2p/proto/sync/receipt.proto";
 import "p2p/proto/transaction.proto";
 
-package p2p.proto.sync;
-
 // TBD: can support a flag to return tx hashes only, good for standalone mempool to remove them,
 // or any node that keeps track of transaction streaming in the consensus.
 message TransactionsRequest {
