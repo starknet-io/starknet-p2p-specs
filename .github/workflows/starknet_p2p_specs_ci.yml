@@ -44,11 +44,12 @@ jobs:
         run: |
           echo "Using the following .proto files from previous step:"
           echo "${{ steps.find-protos.outputs.proto_files }}"
-          protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ${{ steps.find-protos.outputs.proto_files }}
-        # for file in ${{ steps.find-protos.outputs.proto_files }}; do
-        #   echo "Processing $file"
-        #   protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) file
-        # done
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) $file
+          done
+
+        # protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ${{ steps.find-protos.outputs.proto_files }}
 
       # - name: Validate .proto files for Rust compatibility
       #   run: |
