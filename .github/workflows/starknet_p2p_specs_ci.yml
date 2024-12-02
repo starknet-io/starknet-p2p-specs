@@ -40,10 +40,8 @@ jobs:
           # Save the list as an output
           echo "proto_files=$(echo "$proto_files" | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
-      - name: Validate rust
+      - name: Validate Rust compatibility
         run: |
-          echo "Using the following .proto files from previous step:"
-          echo "${{ steps.find-protos.outputs.proto_files }}"
           for file in ${{ steps.find-protos.outputs.proto_files }}; do
             echo "Compiling $file"
             protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) $file
@@ -51,39 +49,33 @@ jobs:
 
         # protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ${{ steps.find-protos.outputs.proto_files }}
 
-      # - name: Validate .proto files for Rust compatibility
-      #   run: |
-      #     protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) *.proto
-        # protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/*.proto
-        # protoc --rust_out=experimental-codegen=enabled,kernel=upb:$(mktemp -d) ./p2p/proto/**/*.proto
-
-      - name: Validate .proto files for Python compatibility
+      - name: Validate Python compatibility
         run: |
-          echo "Searching for .proto files..."
-          proto_files=$(find . -name "*.proto")
-          if [ -z "$proto_files" ]; then
-            echo "No .proto files found."
-            exit 0
-          fi
-          echo "Found the following .proto files:"
-          echo "$proto_files"
-          echo "Compiling protos..."
-          echo "$proto_files" | xargs protoc --proto_path=. --python_out=$(mktemp -d)
-        # find . -name "*.proto" -exec protoc --proto_path=. --python_out=$(mktemp -d) {} +
-        # protoc --python_out=$(mktemp -d) ./p2p/proto/*.proto
-        # protoc --python_out=$(mktemp -d) ./p2p/proto/**/*.proto
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --python_out=$(mktemp -d) $file
+          done
 
-      - name: Validate .proto files for C++ compatibility
+      - name: Validate C++ compatibility
         run: |
-          protoc --cpp_out=$(mktemp -d) *.proto
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --cpp_out=$(mktemp -d) $file
+          done
+        # protoc --cpp_out=$(mktemp -d) *.proto
         # protoc --cpp_out=$(mktemp -d) ./p2p/proto/*.proto
         # protoc --cpp_out=$(mktemp -d) ./p2p/proto/**/*.proto
 
-      - name: Install protoc-gen-go
+      - name: Validate GO compatibility
         run: |
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           export PATH=$PATH:$(go env GOPATH)/bin
-          protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative *.proto
+          for file in ${{ steps.find-protos.outputs.proto_files }}; do
+            echo "Compiling $file"
+            protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative $file
+          done
+          
+        # protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative *.proto
         # protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative ./p2p/proto/*.proto
         # protoc --go_out=$(mktemp -d) --go_opt=paths=source_relative ./p2p/proto/**/*.proto
       
