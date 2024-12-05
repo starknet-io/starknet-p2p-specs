@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-        
+
       - uses: Noelware/setup-protoc@1.1.0
         with:
           version: ${{env.PROTOC_VERSION}}
@@ -68,6 +68,3 @@ jobs:
             echo "Compiling $file"
             protoc --fatal_warnings --go_out=$(mktemp -d) --go_opt=paths=source_relative $file
           done
-
-      - name: Success Message
-        run: echo "All proto compilations passed!"
