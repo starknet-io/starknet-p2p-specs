@@ -18,12 +18,12 @@ The following table describes the different protocols in Starknet, the name that
 negotiation, and the protobuf messages related to the protocol.
 | Protocol | Name (for negotiation) | Request Message | Response Message |
 | ------------ | -------------- | -------------- | -------------- |
-| Headers | /starknet/headers/0.1.0-rc.0 | [BlockHeadersRequest](./header.proto) | [BlockHeadersResponse](./header.proto) |
-| StateDiffs | /starknet/state_diffs/0.1.0-rc.0 | [StateDiffsRequest](./state.proto) | [StateDiffsResponse](./state.proto) |
-| Classes | /starknet/classes/0.1.0-rc.0 | [ClassesRequest](./class.proto) | [ClassesResponse](./class.proto) |
-| Transactions | /starknet/transactions/0.1.0-rc.0 | [TransactionsRequest](./transaction.proto) | [TransactionsResponse](./transaction.proto) |
-| Events | /starknet/events/0.1.0-rc.0 | [EventsRequest](./event.proto) | [EventsResponse](./event.proto) |
-| Kademlia (for discovery) | /starknet/kad/<chain_id>/sync/1.0.0 |
+| Headers | /starknet/<chain_id>/sync/headers/0.1.0-rc.0 | [BlockHeadersRequest](./header.proto) | [BlockHeadersResponse](./header.proto) |
+| StateDiffs | /starknet/<chain_id>/sync/state_diffs/0.1.0-rc.0 | [StateDiffsRequest](./state.proto) | [StateDiffsResponse](./state.proto) |
+| Classes | /starknet/<chain_id>/sync/classes/0.1.0-rc.0 | [ClassesRequest](./class.proto) | [ClassesResponse](./class.proto) |
+| Transactions | /starknet/<chain_id>/sync/transactions/0.1.0-rc.0 | [TransactionsRequest](./transaction.proto) | [TransactionsResponse](./transaction.proto) |
+| Events | /starknet/<chain_id>/sync/events/0.1.0-rc.0 | [EventsRequest](./event.proto) | [EventsResponse](./event.proto) |
+| Kademlia (for discovery) | /starknet/<chain_id>/sync/kad/1.0.0 |
 
 In addition, nodes should also support the `Identify` protocol, who's name for negotiation is
 `/ipfs/id/1.0.0`
