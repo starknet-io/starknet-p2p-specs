@@ -1,6 +1,8 @@
 syntax = "proto3";
 import "p2p/proto/common.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/sync/common";
+
 message StateDiffCommitment {
     uint64 state_diff_length = 1;
     Hash root = 2;

@@ -2,6 +2,8 @@ syntax = "proto3";
 import "p2p/proto/common.proto";
 import "p2p/proto/sync/common.proto";
 
+option go_package = "github.com/starknet-io/starknet-p2pspecs/p2p/proto/sync/header";
+
 // Note: commitments may change to be for the previous blocks like comet/tendermint
 // hash of block header sent to L1
 message SignedBlockHeader {
