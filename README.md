@@ -9,9 +9,9 @@ There are three different networks that serve different type of applications:
 * Consensus - responsible for creating and adding new blocks to Starknet via staking
 
 Each network has a separate discovery network. The Kademlia protocol names for those networks are:
-* /starknet/kad/<chain_id>/sync/1.0.0
-* /starknet/kad/<chain_id>/mempool/1.0.0
-* /starknet/kad/<chain_id>/consensus/1.0.0
+* /starknet/<chain_id>/sync/kad/1.0.0
+* /starknet/<chain_id>/mempool/kad/1.0.0
+* /starknet/<chain_id>/consensus/kad/1.0.0
 
 A node that wants to connect to multiple networks should connect through a different port for each network.
 
