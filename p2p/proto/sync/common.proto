@@ -10,8 +10,8 @@ message StateDiffCommitment {
 
 message Iteration {
     enum Direction {
-        Forward  = 0;
-        Backward = 1;
+        Forward  = 1;
+        Backward = 2;
     }
     oneof start {
         uint64 block_number = 1;

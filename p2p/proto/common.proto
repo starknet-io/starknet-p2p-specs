@@ -51,13 +51,13 @@ message BlockID {
 }
 
 enum L1DataAvailabilityMode {
-    Calldata = 0;
-    Blob = 1;
+    Calldata = 1;
+    Blob = 2;
 }
 
 enum VolitionDomain {
-    L1 = 0;
-    L2 = 1;
+    L1 = 1;
+    L2 = 2;
 }
 
 message BlockProof {

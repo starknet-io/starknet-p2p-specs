@@ -22,8 +22,8 @@ message ConsensusTransaction {
 // Votes will be sent on the "consensus_votes" topic.
 message Vote {
     enum  VoteType {
-        Prevote   = 0;
-        Precommit = 1;
+        Prevote   = 1;
+        Precommit = 2;
     };
 
     // We use a type field to distinguish between prevotes and precommits instead of different

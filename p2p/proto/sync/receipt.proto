@@ -10,8 +10,8 @@ message MessageToL1 {
 }
 
 enum PriceUnit {
-    Wei = 0;
-    Fri = 1;
+    Wei = 1;
+    Fri = 2;
 }
 
 message EthereumAddress {
