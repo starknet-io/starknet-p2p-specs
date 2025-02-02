@@ -4,6 +4,11 @@
 The goal of the mempool p2p protocol is to allow mempools to share transactions they receive through RPC.
 This will make it so that once a user submits a transaction to one mempool it will appear across all mempools.
 
+## Who should support mempool
+Only nodes that support proposing new blocks should store transactions in a mempool.
+
+Full nodes and validator nodes can use the mempool protocol to broadcast transactions they've received from RPC, but they should **not** receive transactions from other nodes and process them.
+
 ## Gossipsub
 The protocol is based on the [Gossipsub](https://docs.libp2p.io/concepts/pubsub/overview/) protocol, V1.1
 
