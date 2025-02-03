@@ -91,7 +91,10 @@ message ProposalFin {
 
 // The content and stream_id are generic fields. The user of the stream can choose to pass whatever message
 // that they want. The messages are then encoded in bytes.
-// For Consensus, we use a content which is a ProposalPart, and a stream_id that is a ConsensusStreamId.
+// For Consensus, we use a content which is a ProposalPart, and a stream_id that is a (HeightAndRound, u64).
+// The u64 is a nonce (initialized randomly at startup and incremented with each stream). 
+// The HeightAndRound is a struct with (u64, u32). As a protobuf message it is saved as bytes 
+// in this order: height, round, nonce. 
 message StreamMessage {
     oneof message {
         bytes content = 1;
