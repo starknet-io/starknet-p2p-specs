@@ -47,11 +47,12 @@ message ConsensusStreamId {
 // Messages which make up a Proposal stream.
 message ProposalPart {
     oneof messages {
-        ProposalInit       init         = 1;
-        ProposalFin        fin          = 2;
-        BlockInfo          block_info   = 3;
-        TransactionBatch   transactions = 4;
-        ProposalCommitment commitment   = 5;
+        ProposalInit       init            = 1;
+        ProposalFin        fin             = 2;
+        BlockInfo          block_info      = 3;
+        TransactionBatch   transactions    = 4;
+        TransactionsFin    transaction_fin = 5;
+        ProposalCommitment commitment      = 6;
     }
 }
 
@@ -69,6 +70,12 @@ message ProposalFin {
 
 message TransactionBatch {
     repeated ConsensusTransaction transactions = 1;
+}
+
+// Marks the completion of the transaction streaming.
+message TransactionsFin {
+    // Total number of transactions executed in the proposal.
+    uint64 executed_transaction_count = 1;
 }
 
 // The content and stream_id are generic fields. The user of the stream can choose to pass whatever

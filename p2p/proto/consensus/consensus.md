@@ -46,8 +46,17 @@ The standard order for a Proposals (following the init):
 1. [ProposalInit][ProposalInitLink] - once
 1. [BlockInfo][BlockInfoLink] - once, required to execute the transactions.
 1. [TransactionBatch][TransactionBatchLink] - multiple
+1. [TransactionsFin][TransactionsFinLink] - once
 1. [ProposalCommitment][ProposalCommitmentLink] - once
 1. [ProposalFin][ProposalFinLink] - once
+
+### Executed Transaction Count
+
+The purpose of [TransactionsFin][TransactionsFinLink] is to allow for increased parallelism between
+the proposer and the validators. Specifically, the proposer can broadcast batches of transactions
+before it has executed them. The Proposer may time out before executing all of the transactions sent
+and so it sends the number of transactions it did execute. This may require validators to roll back
+transactions if they executed transactions sent which the proposer didn't execute.
 
 ### Proposal Commitment
 
@@ -143,9 +152,10 @@ Field which identifies a stream of messages.
 [VoteLink]: consensus.proto#L22
 [ConsensusStreamIdLink]: consensus.proto#L41
 [ProposalPartLink]: consensus.proto#L48
-[ProposalInitLink]: consensus.proto#L58
-[ProposalFinLink]: consensus.proto#L66
-[TransactionBatchLink]: consensus.proto#L70
-[StreamMessageLink]: consensus.proto#L76
-[ProposalCommitmentLink]: consensus.proto#L85
-[BlockInfoLink]: consensus.proto#L111
+[ProposalInitLink]: consensus.proto#L59
+[ProposalFinLink]: consensus.proto#L67
+[TransactionBatchLink]: consensus.proto#L71
+[TransactionsFinLink]: consensus.proto#L76
+[StreamMessageLink]: consensus.proto#L83
+[ProposalCommitmentLink]: consensus.proto#L92
+[BlockInfoLink]: consensus.proto#L118
