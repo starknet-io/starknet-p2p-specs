@@ -46,35 +46,24 @@ The standard order for a Proposals (following the init):
 1. [ProposalInit][ProposalInitLink] - once
 1. [BlockInfo][BlockInfoLink] - once, required to execute the transactions.
 1. [TransactionBatch][TransactionBatchLink] - multiple
-1. [TransactionsFin][TransactionsFinLink] - once
-1. [ProposalCommitment][ProposalCommitmentLink] - once
+1. [executed_transaction_count][ExecutedTransactionCountLink] - once
 1. [ProposalFin][ProposalFinLink] - once
 
 ### Executed Transaction Count
-
-The purpose of [TransactionsFin][TransactionsFinLink] is to allow for increased parallelism between
+The purpose of [executed_transaction_count][ExecutedTransactionCountLink] is to allow for increased parallelism between
 the proposer and the validators. Specifically, the proposer can broadcast batches of transactions
 before it has executed them. The Proposer may time out before executing all of the transactions sent
 and so it sends the number of transactions it did execute. This may require validators to roll back
 transactions if they executed transactions sent which the proposer didn't execute.
 
 ### Proposal Commitment
-
 In Starknet validators vote on an execution of a Proposal, not on an identifier of the values
 proposed. The primary reason for this is that Starknet is optimizing for the e2e latency between:
 1. End user submits a TX
 2. The effect of that TX is widely visible; consensus has been reached on the StateDiff including
    it.
 
-While not strictly needed for consensus, the ProposalCommitment field may be useful to debug nodes
-which disagree a proposal's commitment hash.
-
-#### State Root
-
-Calculating the new state by applying the StateDiff in block H takes a long time, and should not
-block consensus. Instead we allow this to occur in parallel to consensus. Once this is ready we put
-the StateRoot, after applying the StateDiff from block `H`, in the commitment for `H+K`.
-- K is defined in the version constants.
+The `proposal_commitment` included in [ProposalFin][ProposalFinLink] uniquely identifies the proposed block and can help debug disagreements between nodes.
 
 ### Self Justifying Reproposals
 
@@ -106,39 +95,31 @@ prevote quorum supporting `v`, need not re-validate these fields.
 A proposer may not be able to offer a valid proposal. If so, the height can be agreed to be empty.
 Order of messages:
 1. [ProposalInit][ProposalInitLink]
-1. [ProposalCommitment][ProposalCommitmentLink]
-1. [ProposalFin][ProposalFinLink]
-
-The ProposalCommitment for an empty block is:
-- Actual values are sent for: block_number, parent_commitment, builder, timestamp, protocol_version,
-  old_state_root, version_constant_commitment.
-- next_l2_gas_price_fri keeps the value from the last block.
-- All other fields are set to 0 (concatenated_counts contains the len of
-  version_constant_commitment)
+2. [ProposalFin][ProposalFinLink]
 
 # [Streaming][StreamMessageLink]
 
 We define here a generic streaming protocol which is used for proposals.
 
-`sequence_number` - field which defines the order of messages (0 based).
+`message_id` - field which defines the order of messages (0 based).
 
-`content` - the application level information.
+`content` - the application level information (encoded as bytes).
 
 `fin` - signals the last message on the stream.
-- If a receiver sees a message with `sequence_number` greater than that of the fin's
-  `sequence_number` it may either ignore such messages or reject the stream.
+- If a receiver sees a message with `message_id` greater than that of the fin's
+  `message_id` it may either ignore such messages or reject the stream.
+
+`stream_id` - identifier of the stream to which the message belongs.
 
 ## Stream ID
 
 Field which identifies a stream of messages.
-- The primary requirement is that a given sender never reuse the stream_id.
-- Receivers identify streams based on (sender_id, stream_id), so distinct senders need not
+- The primary requirement is that a given sender never reuse the `stream_id`.
+- Receivers identify streams based on (sender_id, `stream_id`), so distinct senders need not
   coordinate IDs.
-- Applications are not expected to derive meaning from the stream ID. The primary reason for being
+- Applications are not expected to derive meaning from the `stream_id`. The primary reason for being
   generic is to put information which may be useful for humans when debugging.
 - This field should be small to avoid unnecessary overhead.
-
-[ConsensusStreamId][ConsensusStreamIdLink] - specific stream ID used for Proposal streaming.
 
 # TODO
 
@@ -149,13 +130,11 @@ Field which identifies a stream of messages.
 
 ----------------------------------------------------------------------------------------------------
 
-[VoteLink]: consensus.proto#L22
-[ConsensusStreamIdLink]: consensus.proto#L41
-[ProposalPartLink]: consensus.proto#L48
-[ProposalInitLink]: consensus.proto#L59
+[VoteLink]: consensus.proto#L19
+[ProposalPartLink]: consensus.proto#L82
+[ProposalInitLink]: consensus.proto#L45
 [ProposalFinLink]: consensus.proto#L67
-[TransactionBatchLink]: consensus.proto#L71
-[TransactionsFinLink]: consensus.proto#L76
-[StreamMessageLink]: consensus.proto#L83
-[ProposalCommitmentLink]: consensus.proto#L92
-[BlockInfoLink]: consensus.proto#L118
+[TransactionBatchLink]: consensus.proto#L63
+[ExecutedTransactionCountLink]: consensus.proto#L88
+[StreamMessageLink]: consensus.proto#L36
+[BlockInfoLink]: consensus.proto#L52
