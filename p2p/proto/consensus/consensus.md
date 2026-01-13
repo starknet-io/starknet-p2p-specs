@@ -57,7 +57,7 @@ and so it sends the number of transactions it did execute. This may require vali
 transactions if they executed transactions sent which the proposer didn't execute.
 
 ### Proposal Commitment
-In Starknet validators vote on an execution of a Proposal, not on an identifier of the values
+In Starknet, validators vote on an execution of a Proposal, not on an identifier of the values
 proposed. The primary reason for this is that Starknet is optimizing for the e2e latency between:
 1. End user submits a TX
 2. The effect of that TX is widely visible; consensus has been reached on the StateDiff including
