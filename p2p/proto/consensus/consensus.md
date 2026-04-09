@@ -42,19 +42,18 @@ based messages are:
 
 ## Order of messages
 
-The standard order for a Proposals (following the init):
-1. [ProposalInit][ProposalInitLink] - once
-1. [BlockInfo][BlockInfoLink] - once, required to execute the transactions.
-1. [TransactionBatch][TransactionBatchLink] - multiple
-1. [executed_transaction_count][ExecutedTransactionCountLink] - once
+The standard order for a Proposal:
+1. [ProposalInit][ProposalInitLink] - once (includes all block metadata)
+1. [TransactionBatch][TransactionBatchLink] - multiple (for non-empty blocks)
 1. [ProposalFin][ProposalFinLink] - once
 
 ### Executed Transaction Count
-The purpose of [executed_transaction_count][ExecutedTransactionCountLink] is to allow for increased parallelism between
-the proposer and the validators. Specifically, the proposer can broadcast batches of transactions
-before it has executed them. The Proposer may time out before executing all of the transactions sent
-and so it sends the number of transactions it did execute. This may require validators to roll back
-transactions if they executed transactions sent which the proposer didn't execute.
+The `executed_transaction_count` field in [ProposalFin][ProposalFinLink] is used to allow for
+increased parallelism between the proposer and the validators. Specifically, the proposer can
+broadcast batches of transactions before it has executed them. The Proposer may time out before
+executing all of the transactions sent and so it sends the number of transactions it did execute.
+This may require validators to roll back transactions if they executed transactions sent which the
+proposer didn't execute.
 
 ### Proposal Commitment
 In Starknet, validators vote on an execution of a Proposal, not on an identifier of the values
@@ -93,7 +92,7 @@ prevote quorum supporting `v`, need not re-validate these fields.
 ### Empty Proposals
 
 A proposer may not be able to offer a valid proposal. If so, the height can be agreed to be empty.
-Order of messages:
+Order of messages (no [TransactionBatch][TransactionBatchLink] messages are sent):
 1. [ProposalInit][ProposalInitLink]
 2. [ProposalFin][ProposalFinLink]
 
@@ -130,11 +129,9 @@ Field which identifies a stream of messages.
 
 ----------------------------------------------------------------------------------------------------
 
-[VoteLink]: consensus.proto#L19
-[ProposalPartLink]: consensus.proto#L82
-[ProposalInitLink]: consensus.proto#L45
-[ProposalFinLink]: consensus.proto#L67
-[TransactionBatchLink]: consensus.proto#L63
-[ExecutedTransactionCountLink]: consensus.proto#L88
-[StreamMessageLink]: consensus.proto#L36
-[BlockInfoLink]: consensus.proto#L52
+[VoteLink]: consensus.proto#L20
+[ProposalPartLink]: consensus.proto#L100
+[ProposalInitLink]: consensus.proto#L47
+[ProposalFinLink]: consensus.proto#L88
+[TransactionBatchLink]: consensus.proto#L64
+[StreamMessageLink]: consensus.proto#L38
